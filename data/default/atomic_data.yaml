@@ -1,0 +1,15 @@
+#YAML
+A: {"h": 0.0, "description": "Arbitray atom"}
+C: {"h": 0.0, "description":"Tricoordinated Carbon"}
+B: {"h": 0.45, "description":"Tricoordinated Boron"}
+N2: {"h":-0.51, "description":"Dicoordinated Nitrogen"}
+N3: {"h":-1.37, "description":"Tricoordinated Nitrogen"}
+O1: {"h":-0.97, "description":"Monocoordinated Oxygen"}
+O2: {"h":-2.09, "description":"Dicoordinated Oxygen"}
+F: {"h":-2.71, "description":"Monocoordinated Flourine"}
+Si: {"h":0., "description":"Tricoordinated Silicon"}
+P2: {"h":-0.19, "description":"Dicoordinated Phosphorus"}
+P3: {"h":-0.75, "description":"Tricoordinated Phosphorus"}
+S1: {"h":-0.46, "description":"Monocoordinated Sulfur"}
+S2: {"h":-1.11, "description":"Dicoordinated Sulfur"}
+Cl: {"h":-1.48, "description":"Monocoordinated Chlorine"}

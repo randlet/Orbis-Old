@@ -1,0 +1,16 @@
+A: {description: Arbitray atom, h: 0.0}
+B: {description: Tricoordinated Boron, h: 0.45000000000000001}
+C: {description: Tricoordinated Carbon, h: 0.0}
+Cl: {description: Monocoordinated Chlorine, h: -1.48}
+F: {description: Monocoordinated Flourine, h: -2.71}
+N2: {description: Dicoordinated Nitrogen, h: -0.51000000000000001}
+N3: {description: Tricoordinated Nitrogen, h: -1.3700000000000001}
+O1: {description: Monocoordinated Oxygen, h: -0.96999999999999997}
+O2: {description: Dicoordinated Oxygen, h: -2.0899999999999999}
+P2: {description: Dicoordinated Phosphorus, h: -0.19}
+P3: {description: Tricoordinated Phosphorus, h: -0.75}
+Q: {description: New Atom Type, h: 0.0}
+S1: {description: Monocoordinated Sulfur, h: -0.46000000000000002}
+S2: {description: Dicoordinated Sulfur, h: -1.1100000000000001}
+Si: {description: Tricoordinated Silicon, h: 0.0}
+T: {description: New Atom Type, h: 0.29999999999999999}
