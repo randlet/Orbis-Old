@@ -587,7 +587,7 @@ if __name__ == "__main__":
         from guiparts import *
         from editatombond import *
 
-       
+        "test 1 for 0.1.1"
         import psyco
         psyco.full()
         app = wx.PySimpleApp(0)
