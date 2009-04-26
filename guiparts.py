@@ -463,10 +463,11 @@ class ResultsMatrix(wx.grid.Grid):
         paster = wx.TextDataObject()
 
         paste_data = ''
-        num = self.GetNumberCols()
+        num_col = self.GetNumberCols()
+        num_row = self.GetNumberRows()
 
-        for ii in range(num):
-            paste_data += self.COPY_DELIM.join([str(data[ii,jj]) for jj in range(num)]+['\n'])
+        for ii in range(num_row):
+            paste_data += self.COPY_DELIM.join([str(data[ii,jj]) for jj in range(num_col)]+['\n'])
         paster.SetText(paste_data)
 
         if wx.TheClipboard.Open():
@@ -474,10 +475,11 @@ class ResultsMatrix(wx.grid.Grid):
             wx.TheClipboard.Close()
 
     def getData(self):
-        num = self.GetNumberCols()
-        data = numpy.mat(numpy.zeros((num,num),float))
-        for ii in range(num):
-            for jj in range(num):
+        num_row = self.GetNumberRows()
+        num_col = self.GetNumberCols()
+        data = numpy.mat(numpy.zeros((num_row,num_col),float))
+        for ii in range(num_row):
+            for jj in range(num_col):
                 val = self.GetCellValue(ii,jj)
                 if val =="":
                     val = '0'
@@ -487,14 +489,17 @@ class ResultsMatrix(wx.grid.Grid):
 
 
     def setLabels(self,row_labels=[],col_labels=[],reverse=False):
-        num_rows = self.solver.getSize()
-        for ii in range(num_rows):
-            if len(col_labels) >= num_rows:
+        num_rows = self.GetNumberRows()
+        num_cols = self.GetNumberCols()
+        for ii in range(num_cols):
+            if len(col_labels) >= num_cols:
                 label = col_labels[ii]
             else:
                 label = str(ii+1)
             self.SetColLabelValue(ii,label)
 
+        for ii in range(num_rows):
+            
             if len(row_labels) >= num_rows:
                 label = row_labels[ii]
             else:
@@ -511,41 +516,49 @@ class ResultsMatrix(wx.grid.Grid):
 
 
     def setData(self,data,reverse=False):
-        size = data.shape[0]
-        for ii in range(size):
-            for jj in range(size):
+        
+        size_ii,size_jj = data.shape
+        
+        
+        for ii in range(size_ii):
+            for jj in range(size_jj):
                 val = data[ii,jj]
                 if abs(val)<settings.eps:
                     val = 0.0
                 
                 if reverse:
-                    self.SetCellValue(size-ii-1,jj, self.FMT %(val))
-                    self.SetReadOnly(size-ii-1,jj,True)
+                    self.SetCellValue(size_ii-ii-1,jj, self.FMT %(val))
+                    self.SetReadOnly(size_ii-ii-1,jj,True)
                 else:
                     self.SetCellValue(ii,jj, self.FMT %(val))
                     self.SetReadOnly(ii,jj,True)
 
         self.AutoSizeColumns()
         
-    def setSize(self,size):
-
+    def setSize(self,row_size,col_size=-1):
+        
+        if col_size<0:
+            col_size = row_size
+            
         cur_size = self.GetNumberCols()
 
-        diff = size - cur_size
-
+        diff = col_size - cur_size
         if diff > 0:
             self.AppendCols(diff,updateLabels=False)
-            self.AppendRows(diff,updateLabels=False)
-            for ii in range(cur_size,size):
-                for jj in range(ii+1):
-                    self.SetCellValue(ii,jj,self.FMT % (0.))
-                    self.SetCellValue(jj,ii,self.FMT % (0.))
-        wx.grid.Grid.SelectionMode
+
         if diff < 0 and size>-1:
             diff = abs(diff)
             self.DeleteCols(cur_size-diff,diff,updateLabels=False)
-            self.DeleteRows(cur_size-diff,diff,updateLabels=False)
 
+        cur_size = self.GetNumberRows()
+        diff = row_size - cur_size
+
+        if diff > 0:
+            self.AppendRows(diff,updateLabels=False)
+        if diff < 0 and size>-1:
+            diff = abs(diff)
+            self.DeleteRows(cur_size-diff,diff,updateLabels=False)
+        
     def refreshFromHuckel(self,event):
         pass
 
@@ -570,24 +583,31 @@ class AtomBondPolarizabilityMatrix(ResultsMatrix):
 
     def __init__(self, parent, data_name,ID=-1, label="", pos=wx.DefaultPosition, size=(100, 25),row_labels=[],col_labels=[]): 
         self.data_name = data_name
-        self.atom_num = 0
         ResultsMatrix.__init__(self, parent, ID=ID, label=label, pos=pos, size=size,row_labels=row_labels,col_labels=col_labels)
 
-    def setAtomNum(self,num):
-        self.atom_num = num
+    def createData(self):
     
         #calculate atom bond polarizability when required
-        data = self.solver._calcSingleABPolarizability(num)
-        
+        data = self.solver._calcABPolarizability()
+        na,nb = self.solver.getSize(),self.solver.getNumBonds()
+        disp_data = numpy.mat(numpy.zeros((na,nb),float))
         if len(data)>0:
-
-            #row_labels = ["E = " +x for x in map(lambda x : "%5.3f" % (x),self.solver.eigen_vals)]
-            self.setLabels()
-            self.setData(data)
+            
+            col_labels = ["Bond\n(%d,%d)" % (x+1,y+1)for x,y,z in data[0]]
+            row_labels = ["Atom %d" % (x+1)for x in range(len(data))]
+            
+            for ii in range(na):
+                for jj in range(nb):
+                    val = data[ii][jj][2]
+                    disp_data[ii,jj] = val if abs(val) > settings.eps else 0.0
+                    
+            self.setLabels(row_labels,col_labels)
+        
+            self.setData(disp_data)
         
     def refreshFromHuckel(self,event):
-        self.setSize(self.solver.getSize())
-        self.setAtomNum(self.atom_num)
+        self.setSize(self.solver.getSize(),self.solver.getNumBonds())
+        self.createData()
 
 
 

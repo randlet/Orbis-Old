@@ -41,6 +41,14 @@ class HuckelSolver(AbstractModel):
 
    
 #------------------------------------------------------------------------------------------------        
+    def getNumBonds(self):
+        n_bonds = 0
+        for ii in range(self.getSize()):
+            for jj in range(ii):
+                if abs(self.data[ii,jj]) > settings.eps:
+                    n_bonds += 1
+        return n_bonds
+
     def getSize(self):
         return self.data.shape[0]
 #------------------------------------------------------------------------------------------------        
@@ -171,6 +179,7 @@ class HuckelSolver(AbstractModel):
         self.ab_polar = []
         for uu in range(N):
             self.ab_polar.append(self._calcSingleABPolarizability(uu))
+        return self.ab_polar
             
     def _calcSingleABPolarizability(self,uu):
 
@@ -181,26 +190,28 @@ class HuckelSolver(AbstractModel):
         M = len(dbl_orbitals) #number of doubly occupied orbitals
 
         #loop over each atom and calculate
-        ab_polar = numpy.mat(numpy.zeros((N,N),float))
+        ab_polar = -1.*numpy.mat(numpy.zeros((N,N),float))
+        ab_polar = []
 
         for ss in range(N):
-            for tt in range(ss+1):
-                abp = 0.
-                for jj in range(M):
-                    c_sj,c_tj,c_uj = [self.eigen_vecs[jj][idx] for idx in [ss,tt,uu]]
-                    e_j = self.eigen_vals[jj]
-                    tmp = 0
-                    for kk in range(M,N):
-                        c_sk,c_tk,c_uk = [self.eigen_vecs[kk][idx] for idx in [ss,tt,uu]]
-                        e_k = self.eigen_vals[kk]
-                        tmp = tmp+c_uk*(c_sj*c_tk+c_tj*c_sk)/(e_j-e_k)
-                        
-                    abp =abp+c_uj*tmp
+            for tt in range(ss):
+                if abs(self.data[ss,tt])>settings.eps:
+                    abp = 0.
+                    for jj in range(M):
+                        c_sj,c_tj,c_uj = [self.eigen_vecs[jj][idx] for idx in [ss,tt,uu]]
+                        e_j = self.eigen_vals[jj]
+                        tmp = 0
+                        for kk in range(M,N):
+                            c_sk,c_tk,c_uk = [self.eigen_vecs[kk][idx] for idx in [ss,tt,uu]]
+                            e_k = self.eigen_vals[kk]
+                            tmp = tmp+c_uk*(c_sj*c_tk+c_tj*c_sk)/(e_j-e_k)
+                            
+                        abp =abp+c_uj*tmp
+                    ab_polar.append((ss,tt,2*abp))
+                    #ab_polar[ss,tt] = abp
+                    #ab_polar[tt,ss] = abp
 
-                ab_polar[ss,tt] = abp
-                ab_polar[tt,ss] = abp
-
-        return 2*ab_polar
+        return ab_polar
         
 #------------------------------------------------------------------------------------------------
     def _calcBondOrders(self):

@@ -88,12 +88,6 @@ class MainFrame(wx.Frame):
         self.atom_bond_matrix = AtomBondPolarizabilityMatrix(self.results_display_atom_bond_pol,-1,size=(300,270),label="atom bond")
         self.huckel_solver.addListener(self.atom_bond_matrix.refreshFromHuckel)
 
-
-        
-        self.atom_num = wx.SpinCtrl(self.results_display_atom_bond_pol,-1,"",min=1,max=1,initial=1,name="atom_num")
-        
-        self.atom_num.Bind(wx.EVT_KEY_UP,self.onKeyPressAtomNum)
-        self.Bind(wx.EVT_SPINCTRL,self.onAtomNumChange,self.atom_num)
         self.huckel_solver.addListener(self.basisSizeChange)
         
         self.file_name = None
@@ -108,25 +102,8 @@ class MainFrame(wx.Frame):
         self.doLayout()
         # end wxGlade
 
-    def onKeyPressAtomNum(self,event):
-        key = event.GetKeyCode()
-        
-        if key == wx.WXK_RETURN or key == wx.WXK_NUMPAD_ENTER:
-            self.atom_bond_matrix.setAtomNum(self.atom_num.GetValue()-1)
-        event.Skip()
-
     def basisSizeChange(self,event):
-        
-        self.atom_num.SetRange(1,self.huckel_solver.getSize())
-        
-        if self.atom_bond_matrix.atom_num>self.huckel_solver.getSize()-1:
-            
-            self.atom_bond_matrix.setAtomNum(0)
-        
-        
-    def onAtomNumChange(self,event):
-        self.atom_bond_matrix.setAtomNum(self.atom_num.GetValue()-1)
-        event.Skip()
+        pass
         
     def setLevelPointer(self,level):
         if level != self.level_pointer:
@@ -545,11 +522,6 @@ class MainFrame(wx.Frame):
         
         pol_sizer2 = wx.BoxSizer(wx.VERTICAL)
 
-        atom_num_box = wx.StaticBox(self.results_display_atom_bond_pol,label="Atom Number")
-        atom_num_sizer = wx.StaticBoxSizer(atom_num_box,wx.VERTICAL)
-        atom_num_sizer.Add(self.atom_num,flag=wx.EXPAND)
-        
-        pol_sizer2.Add(atom_num_sizer,0,wx.EXPAND)        
         pol_sizer2.Add(self.atom_bond_matrix,1,wx.EXPAND)
 
         self.results_display_atom_bond_pol.SetSizer(pol_sizer2)

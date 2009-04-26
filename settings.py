@@ -4,7 +4,7 @@ root = os.path.dirname(os.path.abspath(sys.argv[0]))
 logfilen = logfile = root+'/simple_huckel.log'
 logfile = open(logfilen,'w')
 sys.stdout = logfile
-print sys.argv
+
 logfile.write(sys.argv[0])
 logfile.flush()
 
@@ -25,7 +25,7 @@ data_dir_name = root+'/data'
 #atomic_data_file = os.path.join(os.path.dirname(__file__),data_dir_name,'atomic_data.yaml')
 atomic_data_file = data_dir_name+'/atomic_data.yaml'
 default_atomic_data_file = data_dir_name+'/default/atomic_data.yaml'
-print atomic_data_file,default_atomic_data_file
+
 a = Atom(0,0) #preload atom types
 b = Atom(1,1)
 bond_data_file = data_dir_name+'/bond_data.yaml'

@@ -15,8 +15,8 @@ AppUpdatesURL=http://www.simplehuckel.com
 DefaultDirName={pf}\Orbis
 DefaultGroupName=Orbis
 AllowNoIcons=yes
-LicenseFile=C:\Python25\code\huckel\dist\license.txt
-OutputBaseFilename=install_orbis_0.1.1
+LicenseFile=C:\git\orbis\dist\license.txt
+OutputBaseFilename=install_orbis_0.1.2
 Compression=lzma
 SolidCompression=yes
 
@@ -28,8 +28,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Python25\code\huckel\dist\orbis.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Python25\code\huckel\dist\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\git\orbis\dist\orbis.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\git\orbis\dist\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
