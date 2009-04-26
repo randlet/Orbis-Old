@@ -290,7 +290,7 @@ class MainFrame(wx.Frame):
         huckel_dat =self.huckel_solver.data.tolist()
         outfile.write(','+','.join(["%d" % (x+1) for x in range(size)])+'\n')
         for ii,row in enumerate(huckel_dat):
-            out = str(ii+1)+','+','.join(["%f" % (x) for x in row])
+            out = str(ii+1)+','+','.join(["%e" % (x) for x in row])
             outfile.write(out+'\n')
 
         outfile.write('\n\nEigenvalues and vectors\n')
@@ -298,7 +298,7 @@ class MainFrame(wx.Frame):
         for ii in range(size):
             
             out = 'E = %f' % (self.huckel_solver.eigen_vals[size-ii-1])
-            out += ','+','.join(["%f" % (x) for x in self.huckel_solver.eigen_vecs[size-ii-1]])
+            out += ','+','.join(["%e" % (x) for x in self.huckel_solver.eigen_vecs[size-ii-1]])
             outfile.write(out+'\n')
 
         outfile.write('\n\nPi-Bond Orders\n')
@@ -311,14 +311,14 @@ class MainFrame(wx.Frame):
         outfile.write('\n\nAtom-Atom Polarizabilities\n')
         outfile.write(','+','.join(["%d" % (x+1) for x in range(size)])+'\n')
         for ii,row in enumerate(self.huckel_solver.aa_polar.tolist()):
-            out = str(ii+1)+','+','.join(["%f" % (x) for x in row])
+            out = str(ii+1)+','+','.join(["%e" % (x) for x in row])
             outfile.write(out+'\n')
 
         for jj in range(size):
             outfile.write('\n\nAtom-Bond Polarizabilities for Atom %d\n' %(jj+1))
             outfile.write(','+','.join(["%d" % (x+1) for x in range(size)])+'\n')
-            for ii,row in enumerate(self.huckel_solver.ab_polar[jj].tolist()):
-                out = str(ii+1)+','+','.join(["%f" % (x) for x in row])
+            for ii,row in enumerate(self.huckel_solver._calcSingleABPolarizability(jj).tolist()):
+                out = str(ii+1)+','+','.join(["%e" % (x) for x in row])
                 outfile.write(out+'\n')
             
             
@@ -587,7 +587,6 @@ if __name__ == "__main__":
         from guiparts import *
         from editatombond import *
 
-        "test 1 for 0.1.1"
         import psyco
         psyco.full()
         app = wx.PySimpleApp(0)

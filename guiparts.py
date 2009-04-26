@@ -426,7 +426,7 @@ class HuckelMatrix(wx.grid.Grid):
 class ResultsMatrix(wx.grid.Grid):
 
     COL_WIDTH = 40
-    FMT = "%5.3f"
+    FMT = "%e"
     COPY_DELIM = '\t'
 
     def __init__(self, parent, ID=-1, label="", pos=wx.DefaultPosition, size=(-1, -1),row_labels=[],col_labels=[]): 
