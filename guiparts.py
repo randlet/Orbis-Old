@@ -546,7 +546,7 @@ class ResultsMatrix(wx.grid.Grid):
         if diff > 0:
             self.AppendCols(diff,updateLabels=False)
 
-        if diff < 0 and size>-1:
+        if diff < 0 and col_size>-1:
             diff = abs(diff)
             self.DeleteCols(cur_size-diff,diff,updateLabels=False)
 
@@ -555,7 +555,7 @@ class ResultsMatrix(wx.grid.Grid):
 
         if diff > 0:
             self.AppendRows(diff,updateLabels=False)
-        if diff < 0 and size>-1:
+        if diff < 0 and row_size>-1:
             diff = abs(diff)
             self.DeleteRows(cur_size-diff,diff,updateLabels=False)
         

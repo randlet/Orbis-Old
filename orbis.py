@@ -291,17 +291,17 @@ class MainFrame(wx.Frame):
             out = str(ii+1)+','+','.join([fmt % (x if abs(x)>settings.eps else 0) for x in row])
             outfile.write(out+'\n')
 
-        for jj in range(size):
-            outfile.write('\n\nAtom-Bond Polarizabilities for Atom %d\n' %(jj+1))
-            outfile.write(','+','.join(["%d" % (x+1) for x in range(size)])+'\n')
-            for ii,row in enumerate(self.huckel_solver._calcSingleABPolarizability(jj).tolist()):
-                out = str(ii+1)+','+','.join([fmt % (x if abs(x)>settings.eps else 0) for x in row])
-                outfile.write(out+'\n')
-            
+        
+        outfile.write('\n\nAtom-Bond Polarizabilities for\n' )
+        data = self.huckel_solver.ab_polar
+
+        outfile.write(','+','.join(["Bond (%d-%d)" % (x+1,y+1)for x,y,z in data[0]])+'\n')
+
+        for ii,row in enumerate(data):
+            out = 'Atom '+str(ii+1)+','+','.join([fmt % (x[2] if abs(x[2])>settings.eps else 0 ) for x in row])
+            outfile.write(out+'\n')
             
         outfile.close()
-        #for ii in range(self.huckel_solver.getSize()):
-         #   csv_writer.
         
         
         

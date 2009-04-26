@@ -16,7 +16,7 @@ DefaultDirName={pf}\Orbis
 DefaultGroupName=Orbis
 AllowNoIcons=yes
 LicenseFile=C:\git\orbis\dist\license.txt
-OutputBaseFilename=install_orbis_0.1.2
+OutputBaseFilename=install_orbis_0.1.3
 Compression=lzma
 SolidCompression=yes
 
