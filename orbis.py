@@ -285,12 +285,12 @@ class MainFrame(wx.Frame):
     def exportData(self,fname):
         outfile = open(fname,'w')
         size = self.huckel_solver.getSize()
-        
+        fmt = "%.4G"
         outfile.write('Huckel Matrix\n')
         huckel_dat =self.huckel_solver.data.tolist()
         outfile.write(','+','.join(["%d" % (x+1) for x in range(size)])+'\n')
         for ii,row in enumerate(huckel_dat):
-            out = str(ii+1)+','+','.join(["%e" % (x) for x in row])
+            out = str(ii+1)+','+','.join([fmt % (x) for x in row])
             outfile.write(out+'\n')
 
         outfile.write('\n\nEigenvalues and vectors\n')
@@ -298,27 +298,27 @@ class MainFrame(wx.Frame):
         for ii in range(size):
             
             out = 'E = %f' % (self.huckel_solver.eigen_vals[size-ii-1])
-            out += ','+','.join(["%e" % (x) for x in self.huckel_solver.eigen_vecs[size-ii-1]])
+            out += ','+','.join([fmt % (x if abs(x)>settings.eps else 0) for x in self.huckel_solver.eigen_vecs[size-ii-1]])
             outfile.write(out+'\n')
 
         outfile.write('\n\nPi-Bond Orders\n')
         outfile.write(','+','.join(["%d" % (x+1) for x in range(size)])+'\n')
         for ii,row in enumerate(self.huckel_solver.bond_orders.tolist()):
-            out = str(ii+1)+','+','.join(["%f" % (x) for x in row])
+            out = str(ii+1)+','+','.join([fmt % (x if abs(x)>settings.eps else 0) for x in row])
             outfile.write(out+'\n')
             
 
         outfile.write('\n\nAtom-Atom Polarizabilities\n')
         outfile.write(','+','.join(["%d" % (x+1) for x in range(size)])+'\n')
         for ii,row in enumerate(self.huckel_solver.aa_polar.tolist()):
-            out = str(ii+1)+','+','.join(["%e" % (x) for x in row])
+            out = str(ii+1)+','+','.join([fmt % (x if abs(x)>settings.eps else 0) for x in row])
             outfile.write(out+'\n')
 
         for jj in range(size):
             outfile.write('\n\nAtom-Bond Polarizabilities for Atom %d\n' %(jj+1))
             outfile.write(','+','.join(["%d" % (x+1) for x in range(size)])+'\n')
             for ii,row in enumerate(self.huckel_solver._calcSingleABPolarizability(jj).tolist()):
-                out = str(ii+1)+','+','.join(["%e" % (x) for x in row])
+                out = str(ii+1)+','+','.join([fmt % (x if abs(x)>settings.eps else 0) for x in row])
                 outfile.write(out+'\n')
             
             
