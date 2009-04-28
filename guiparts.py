@@ -40,7 +40,7 @@ class PlotPanel (wx.Panel):
 
         self._SetSize()
         self.draw()
-
+        self.SetColor()
         self._resizeflag = False
 
         self.Bind(wx.EVT_IDLE, self._onIdle)
@@ -166,7 +166,7 @@ class ELDPlotPanel (PlotPanel):
 
         self.subplot.clear()
         self.subplot.set_ylabel("Energy")
-        self.subplot.set_position([0.175,0.1,0.8,0.8])
+#        self.subplot.set_position([0.175,0.1,0.8,0.8])
         self.subplot.set_xticklabels([""])
         self.subplot.set_xticks([])
 
@@ -590,9 +590,13 @@ class NetChargeMatrix(ResultsMatrix):
 
         data = self.solver.net_charges
         na = self.solver.getSize()
-        self.setSize(1,na)
-        disp_data = numpy.mat(numpy.zeros((1,na),float))
+        if na >= 1:
+            self.setSize(1,na)
+        else:
+            self.setSize(0)
+
         if len(data)>0:
+            disp_data = numpy.mat(numpy.zeros((1,na),float))
             
             col_labels = ["Atom\n%d" % (x+1)for x in range(len(data))]
             row_labels = ["Net Charge"]
@@ -602,7 +606,7 @@ class NetChargeMatrix(ResultsMatrix):
                 disp_data[0,ii] = val if abs(val) > settings.eps else 0.0
                     
             self.setLabels(row_labels,col_labels)
-            print disp_data
+
             self.setData(disp_data)
 
             

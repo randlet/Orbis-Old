@@ -1,5 +1,6 @@
 from guiparts import PlotPanel
 from molecule import Molecule,Atom,Bond
+import matplotlib
 import math            
 import numpy
 import settings        
@@ -12,20 +13,40 @@ from editatombond import EditBondTypes
 class AtomTypeDialog(wx.Dialog):
     
     def __init__(self,atom,atom_num):
-        wx.Dialog.__init__(self,None,-1, 'Select Atom Properties',size =(235,130))
-        ok_button = wx.Button(self,wx.ID_OK,"OK",pos=(70,70))
-        ok_button.SetDefault()
-        cancel_button = wx.Button(self,wx.ID_CANCEL, "Cancel", pos = (150,70))
+        wx.Dialog.__init__(self,None,-1, 'Select Atom Properties')
         
-        wx.StaticText(self, -1,u"Select Atom Type:", style=wx.ALIGN_CENTRE,pos = (10,10))
+        ok_button = wx.Button(self,wx.ID_OK,"OK")
+        ok_button.SetDefault()
+        cancel_button = wx.Button(self,wx.ID_CANCEL, "Cancel")
+
+        a_txt = wx.StaticText(self, -1,u"Select Atom Type:", style=wx.ALIGN_CENTRE)
         
         self.atom_type = wx.ComboBox(self,-1,atom.sym,choices=Atom.ATOM_TYPES.keys(),style=wx.CB_DROPDOWN|wx.CB_READONLY,pos=(140,7))
         self.atom_type.SetToolTip(wx.ToolTip(Atom.ATOM_TYPES[self.atom_type.GetValue()]["description"]))
         self.Bind(wx.EVT_COMBOBOX,self.onAtomType,self.atom_type)
         
-        wx.StaticText(self, -1,u"Set hx for atom %d:" % (atom_num), style=wx.ALIGN_CENTRE,pos = (10,40))
-        self.hx = wx.TextCtrl(self, -1,str(atom.hx),pos=(140,37),validator=NumberValidator())
+        hx_txt = wx.StaticText(self, -1,u"Set hx for atom %d:" % (atom_num), style=wx.ALIGN_CENTRE,pos = (10,40))
+        self.hx = wx.TextCtrl(self, -1,str(atom.hx),validator=NumberValidator())
         self.hx.SetValue(str(atom.hx))
+        
+
+        main_sizer = wx.BoxSizer(wx.VERTICAL)
+        
+        sizer = wx.GridSizer(2,2,10,10)
+        sizer.Add(a_txt,flag=wx.ALIGN_RIGHT)
+        sizer.Add(self.atom_type,flag=wx.ALIGN_LEFT)
+        sizer.Add(hx_txt,flag=wx.ALIGN_RIGHT)
+        sizer.Add(self.hx,flag=wx.ALIGN_LEFT)
+
+        button_sizer = wx.BoxSizer()
+
+        button_sizer.Add(ok_button,flag=wx.ALIGN_RIGHT)
+        button_sizer.Add(cancel_button,flag=wx.ALIGN_RIGHT)
+        
+        main_sizer.Add(sizer,flag=wx.ALL,border=5)
+        main_sizer.Add(button_sizer,-1,wx.ALL|wx.ALIGN_RIGHT,5)
+        self.SetSizer(main_sizer)
+        self.Fit()
         
     def onAtomType(self,event):
         atom_type = Atom.ATOM_TYPES[self.atom_type.GetValue()]
@@ -35,15 +56,30 @@ class AtomTypeDialog(wx.Dialog):
 class BondTypeDialog(wx.Dialog):
     
     def __init__(self,bond,input_str):
-        wx.Dialog.__init__(self,None,-1, 'Select Bond Properties',size =(335,110))
-        ok_button = wx.Button(self,wx.ID_OK,"OK",pos=(170,50))
+        wx.Dialog.__init__(self,None,-1, 'Select Bond Properties')
+        ok_button = wx.Button(self,wx.ID_OK,"OK")
         ok_button.SetDefault()
-        cancel_button = wx.Button(self,wx.ID_CANCEL, "Cancel", pos = (250,50))
+        cancel_button = wx.Button(self,wx.ID_CANCEL, "Cancel")
         
-        self.k_xy_text = wx.StaticText(self, -1,input_str, style=wx.ALIGN_CENTRE,pos = (10,10))
-        self.k_xy = wx.TextCtrl(self, -1,str(bond.k_xy),pos=(240,7),validator=NumberValidator())
+        self.k_xy_text = wx.StaticText(self, -1,input_str)
+        self.k_xy = wx.TextCtrl(self, -1,str(bond.k_xy),validator=NumberValidator())
         self.k_xy.SetValue(str(bond.k_xy))
 
+
+        main_sizer = wx.BoxSizer(wx.VERTICAL)
+        
+        sizer = wx.BoxSizer()
+        sizer.Add(self.k_xy_text,flag=wx.ALIGN_RIGHT)
+        sizer.Add(self.k_xy,flag=wx.ALIGN_LEFT)
+        button_sizer = wx.BoxSizer()
+
+        button_sizer.Add(ok_button,flag=wx.ALIGN_RIGHT)
+        button_sizer.Add(cancel_button,flag=wx.ALIGN_RIGHT)
+       
+        main_sizer.Add(sizer,flag=wx.ALL,border=5)
+        main_sizer.Add(button_sizer,-1,wx.ALL|wx.ALIGN_RIGHT,5)
+        self.SetSizer(main_sizer)
+        self.Fit()
         
 #===================================================================================================
 class MoleculePlotPanel(PlotPanel):
@@ -135,7 +171,7 @@ class MoleculePlotPanel(PlotPanel):
         unconnected_bond =  self.line != None
         click_on_bond_or_atom = self.set_focus_to_huck != None
         down_on_atom = self.mouse_down_on_atom >= 0
-        return  not (click_on_bond_or_atom or unconnected_bond or down_on_atom or self.moved)
+        return  not (click_on_bond_or_atom or unconnected_bond or down_on_atom)
     #------------------------------------------------------------------------------------------------                      
     def addNewAtom(self,x,y,hx=0.0,sym=""):
         if sym == "":
@@ -205,7 +241,7 @@ class MoleculePlotPanel(PlotPanel):
             #check if a new atom or bond is needed after click
             if event.inaxes:
                 self._redrawFlag = True
-                if self.newAtomRequired(self.mouseUpX,self.mouseUpY):
+                if self.newAtomRequired(self.mouseUpX,self.mouseUpY) and not self.moved:
                     hx = Atom.ATOM_TYPES[self.current_atom_type]["h"]
                     self.addNewAtom(self.mouseUpX,self.mouseUpY,hx,self.current_atom_type)
                 else:
@@ -364,31 +400,76 @@ class MoleculePlotPanel(PlotPanel):
                 self.tooltip.Enable(True)
                 
             elif self.onAtom(event.xdata,event.ydata) >=0 and self.line == None:
-                self.tooltip.SetTip('Left-Click atom or bond to show position in Huckel Matrix\nLeft-Click on atom & drag to another atom to create a bond\nDouble-Click to set hx or k_xy value\nRight-Click to delete atom or bond\nScroll-Wheel to zoom')
+                tip = 'Left-Click and hold on atom then drag to another atom to create a bond\n' \
+                    'Ctrl+Left-Click and hold on atom to move\n'\
+                    'Double-Click on atom or bond to set hx or k_xy\n'\
+                    'Right-Click to delete atom or bond\n'\
+                    'Scroll-Wheel to zoom\n'\
+                    'Ctrl+Scroll-Wheel to rotate plot'
+                self.tooltip.SetTip(tip)
                 self.tooltip.Enable(True)
             else:
                 self.tooltip.Enable(False)
 
             
         if self.mouseDown and self.mouse_down_on_atom >=0 and event.button == self.DRAW_BUTTON:
+            if not event.key == "control":
+    
+                self.lineXs = [self.mouseDownX,event.xdata]
+                self.lineYs = [self.mouseDownY,event.ydata]
+    
+                if not self.line:
+                    self.line = self.subplot.plot(self.lineXs,self.lineYs,'-r')[-1]
+                else:
+                    self.line.set_data(self.lineXs,self.lineYs)
 
-            self.lineXs = [self.mouseDownX,event.xdata]
-            self.lineYs = [self.mouseDownY,event.ydata]
-
-            if not self.line:
-                self.line = self.subplot.plot(self.lineXs,self.lineYs,'-r')[-1]
             else:
-                self.line.set_data(self.lineXs,self.lineYs)
-
+                atom = self.molecule.atom_stack[self.mouse_down_on_atom]
+                atom.setPos(event.xdata,event.ydata)
+                for bond in self.molecule.bond_stack:
+                    if atom in bond.atoms:
+                        bond.refresh()
+#                self.draw
             self.subplot.axis(self.AXIS_MIN_MAX)
             self.canvas.draw()
     #------------------------------------------------------------------------------------------------          
     def mouseWheel(self,event):
-        if event.step < 0:
-            self.resize(-1)
+
+        if event.key == "control":
+            if event.step < 0:
+                self.rotate(-1,event.xdata,event.ydata)
+            else:
+                self.rotate(1,event.xdata,event.ydata)
+            
         else:
-            self.resize(1)
+            if event.step < 0:
+                self.resize(-1,event.xdata,event.ydata)
+            else:
+                self.resize(1,event.xdata,event.ydata)
     #------------------------------------------------------------------------------------------------          
+    def rotate(self,dir,xo,yo):
+
+
+        x = numpy.arange(0.,2*numpy.pi,0.05)
+        trans = matplotlib.transforms.blended_transform_factory(self.subplot.transData,self.subplot.transAxes)
+        for atom in self.molecule.atom_stack:
+            pos = numpy.array([atom.x-xo,atom.y-yo]).reshape((2,1))
+
+            dt = 5*math.pi/180.*dir
+            mat = numpy.mat([[math.cos(dt),-math.sin(dt)],[math.sin(dt),math.cos(dt)]],float)
+            new_pos = mat*pos
+            x_pos = new_pos[0,0]+xo
+            y_pos = new_pos[1,0]+yo
+
+
+            atom.setPos(x_pos,y_pos)
+
+        for bond in self.molecule.bond_stack:
+            bond.refresh()
+            
+        self.draw()        
+        self.GetParent().results_display_2dmo._redrawFlag = True
+        
     def _onIdle( self, evt ):
 
         PlotPanel._onIdle(self,evt)
@@ -467,6 +548,7 @@ class MoleculePlotPanel(PlotPanel):
         self.subplot.set_aspect('auto',adjustable="datalim")
         self.subplot.set_xticklabels([""])
         self.subplot.set_yticklabels([""])
+
         
     #------------------------------------------------------------------------------------------------              
     def draw( self ):
@@ -479,7 +561,7 @@ class MoleculePlotPanel(PlotPanel):
         self.subplot.axis(self.AXIS_MIN_MAX)
         self.canvas.draw()
 #------------------------------------------------------------------------------------------------                      
-    def resize(self,zoom = 0):
+    def resize(self,zoom = 0,xo=0,yo=0):
         if len(self.molecule.atom_stack)>1:
             if zoom == 0 :
                 # auto zoom out 
@@ -499,12 +581,11 @@ class MoleculePlotPanel(PlotPanel):
                 ax = self.subplot.axis()
                 dx = abs(ax[0]-ax[1])*scale
                 dy = abs(ax[2]-ax[3])*scale
-    
                 if zoom < 0:
                     ax = [ax[0]-dx,ax[1]+dx,ax[2]-dy,ax[3]+dy]
                 else:
                     ax = [ax[0]+dx,ax[1]-dx,ax[2]+dy,ax[3]-dy]
-                    
+
             self.XTOL = abs(ax[1]-ax[0])*self.TOL_RATIO
             self.YTOL = self.XTOL
             

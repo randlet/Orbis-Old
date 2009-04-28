@@ -42,15 +42,15 @@ class MainFrame(wx.Frame):
         self.level_pointer = 0
         #huckel solver and sketch_pad must be set up first since many of the controls and panels rely on it existing
         self.huckel_solver = huckelsolver.HuckelSolver()
-        self.sketch_pad = MoleculePlotPanel(self, size=(400,300))
+        self.sketch_pad = MoleculePlotPanel(self, size=(500,300),style=wx.RAISED_BORDER)
         self.huckel_solver.addListener(self.sketch_pad.refreshFromHuckel)        
 
 
-        self.results_display_2dmo = EigenPlotPanel(self,size=(400,300))
+        self.results_display_2dmo = EigenPlotPanel(self,size=(400,300),style=wx.RAISED_BORDER)
         self.huckel_solver.addListener(self.results_display_2dmo.refreshFromHuckel)
 
 
-        self.huckel_matrix = HuckelMatrix(self,size=(400, 300),label="Huckel Matrix")
+        self.huckel_matrix = HuckelMatrix(self,size=(300, 300),label="Huckel Matrix")
         self.huckel_solver.addListener(self.huckel_matrix.refreshFromHuckel)
         
         self.controls = ControlPanel(self, label="Controls", size=(125,100))
@@ -60,11 +60,11 @@ class MainFrame(wx.Frame):
         self.sketch_pad.current_atom_type = atype
         
         #create energy level diagram plot
-        self.eld = ELDPlotPanel(self,size=(300,300))
+        self.eld = ELDPlotPanel(self,size=(400,300),style=wx.RAISED_BORDER)
         self.huckel_solver.addListener(self.eld.refreshFromHuckel)
 
         #create results notebook
-        self.results_display = wx.Notebook(self, -1, size=(400,300),style=wx.NB_TOP)
+        self.results_display = wx.Notebook(self, -1, size=(400,300),style=wx.NO_BORDER)
 
         #eigenvalue/vectors tab 
         self.results_display_eig = wx.Panel(self.results_display) 
@@ -414,8 +414,8 @@ class MainFrame(wx.Frame):
             self.controls.basis_size.Enable(True)
             self.controls.atom_type.Enable(False)
 
-            self.results_display.RemovePage(3)            
-            self.results_display.RemovePage(2)
+            self.results_display.RemovePage(4)            
+            self.results_display.RemovePage(3)
 #            self.results_display_atom_bond_pol.Hide()
             self.results_display_pol.Hide()
 
@@ -540,7 +540,7 @@ class MainFrame(wx.Frame):
 
         self.results_display.AddPage(self.results_display_charge,"Net Charges")
         nc_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        nc_sizer.Add(self.pibond_matrix,1,wx.EXPAND)
+        nc_sizer.Add(self.net_charge,1,wx.EXPAND)
         self.results_display_charge.SetSizer(nc_sizer)
         self.net_charge.SetSize(self.results_display.GetPage(0).GetSize())
 
@@ -560,7 +560,7 @@ class MainFrame(wx.Frame):
 
         self.results_display.AddPage(self.results_display_atom_bond_pol, "A-B Polarizabilities")
         
-        results_sizer.Add(self.results_display, 1, wx.EXPAND, 5)
+        results_sizer.Add(self.results_display, 1, wx.EXPAND)
 
 
         main_sizer.Add(results_sizer, 1, wx.EXPAND, 0)
@@ -571,7 +571,7 @@ class MainFrame(wx.Frame):
         self.results_sizer = results_sizer
         self.setVisualMode(True)
         self.Layout()
-        #self.Maximize()
+        self.Maximize()
         
         # end wxGlade
 
@@ -580,7 +580,7 @@ class MainFrame(wx.Frame):
 
 if __name__ == "__main__":
 
-#    try:
+    try:
         
 
 
@@ -602,7 +602,7 @@ if __name__ == "__main__":
         main_frame.Show()
         app.MainLoop()
         
- #   except:
- #       print sys.exc_info()
- #   finally:
- #       settings.logfile.close()
+    except:
+        print sys.exc_info()
+    finally:
+        settings.logfile.close()

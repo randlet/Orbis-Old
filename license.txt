@@ -1,36 +1,152 @@
-END-USER LICENSE AGREEMENT FOR ORBIS IMPORTANT PLEASE READ THE TERMS AND CONDITIONS OF THIS LICENSE AGREEMENT CAREFULLY BEFORE CONTINUING WITH THIS PROGRAM INSTALL: {INSERT COMPANY NAME?s } End-User License Agreement ("EULA") is a legal agreement between you (either an individual or a single entity) and Randle Taylor. for the Randle Taylor software product(s) identified above which may include associated software components, media, printed materials, and "online" or electronic documentation ("SOFTWARE PRODUCT"). By installing, copying, or otherwise using the SOFTWARE PRODUCT, you agree to be bound by the terms of this EULA. This license agreement represents the entire agreement concerning the program between you and Randle Taylor, (referred to as "licenser"), and it supersedes any prior proposal, representation, or understanding between the parties. If you do not agree to the terms of this EULA, do not install or use the SOFTWARE PRODUCT. 
+END-USER LICENSE AGREEMENT FOR ORBIS IMPORTANT PLEASE READ THE TERMS AND CONDITIONS OF THIS LICENSE AGREEMENT CAREFULLY BEFORE CONTINUING WITH THIS PROGRAM INSTALL:  End-User License Agreement ("EULA") is a legal agreement between you (either an individual or a single entity) and Randle Taylor. for the Randle Taylor software product(s) identified above which may include associated software components, media, printed materials, and "online" or electronic documentation (Oribs). By installing, copying, or otherwise using Orbis, you agree to be bound by the terms of this EULA. This license agreement represents the entire agreement concerning the program between you and Randle Taylor, (referred to as "licenser"), and it supersedes any prior proposal, representation, or understanding between the parties. If you do not agree to the terms of this EULA, do not install or use Orbis. 
 
-The SOFTWARE PRODUCT is protected by copyright laws and international copyright treaties, as well as other intellectual property laws and treaties. The SOFTWARE PRODUCT is licensed, not sold. 
+Orbis is protected by copyright laws and international copyright treaties, as well as other intellectual property laws and treaties. Orbis is licensed, not sold. 
 
 1. GRANT OF LICENSE. 
-The SOFTWARE PRODUCT is licensed as follows: 
+Orbis is licensed as follows: 
 (a) Installation and Use.
-Randle Taylor grants you the right to install and use copies of the SOFTWARE PRODUCT on your computer running a validly licensed copy of the operating system for which the SOFTWARE PRODUCT was designed [e.g., Windows 95?, Windows NT?, Windows 98?, Windows 2000 ?, Windows 2003, Windows XP, Windows ME, Windows Vista].
+Randle Taylor grants you the right to install and use copies of Orbis on your computer running a validly licensed copy of the operating system for which Orbis was designed [e.g., Windows NT,  Windows 2000, Windows 2003, Windows XP, Windows ME, Windows Vista].
 (b) Backup Copies.
-You may also make copies of the SOFTWARE PRODUCT as may be necessary for backup and archival purposes.
+You may also make copies of Orbis as may be necessary for backup and archival purposes.
 
 2. DESCRIPTION OF OTHER RIGHTS AND LIMITATIONS.
 (a) Maintenance of Copyright Notices.
-You must not remove or alter any copyright notices on any and all copies of the SOFTWARE PRODUCT.
+You must not remove or alter any copyright notices on any and all copies of Orbis.
 (b) Distribution.
-You may not distribute registered copies of the SOFTWARE PRODUCT to third parties. Evaluation versions available for download from Randle Taylor?s websites may be freely distributed.
+You may not distribute registered copies of Orbis to third parties. Evaluation versions available for download from www.simplehuckel.com website may be freely distributed.
 (c) Prohibition on Reverse Engineering, Decompilation, and Disassembly.
-You may not reverse engineer, decompile, or disassemble the SOFTWARE PRODUCT, except and only to the extent that such activity is expressly permitted by applicable law notwithstanding this limitation. 
+You may not reverse engineer, decompile, or disassemble Orbis, except and only to the extent that such activity is expressly permitted by applicable law notwithstanding this limitation. 
 (d) Rental.
-You may not rent, lease, or lend the SOFTWARE PRODUCT.
+You may not rent, lease, or lend Orbis.
 (e) Support Services.
-Randle Taylor may provide you with support services related to the SOFTWARE PRODUCT ("Support Services"). Any supplemental software code provided to you as part of the Support Services shall be considered part of the SOFTWARE PRODUCT and subject to the terms and conditions of this EULA. 
+Randle Taylor may provide you with support services related to Orbis ("Support Services"). Any supplemental software code provided to you as part of the Support Services shall be considered part of Orbis and subject to the terms and conditions of this EULA. 
 (f) Compliance with Applicable Laws.
-You must comply with all applicable laws regarding use of the SOFTWARE PRODUCT.
+You must comply with all applicable laws regarding use of Orbis.
 
 3. TERMINATION 
-Without prejudice to any other rights, Randle Taylor may terminate this EULA if you fail to comply with the terms and conditions of this EULA. In such event, you must destroy all copies of the SOFTWARE PRODUCT in your possession.
+Without prejudice to any other rights, Randle Taylor may terminate this EULA if you fail to comply with the terms and conditions of this EULA. In such event, you must destroy all copies of Orbis in your possession.
 
 4. COPYRIGHT
-All title, including but not limited to copyrights, in and to the SOFTWARE PRODUCT and any copies thereof are owned by Randle Taylor or its suppliers. All title and intellectual property rights in and to the content which may be accessed through use of the SOFTWARE PRODUCT is the property of the respective content owner and may be protected by applicable copyright or other intellectual property laws and treaties. This EULA grants you no rights to use such content. All rights not expressly granted are reserved by Randle Taylor. 
+All title, including but not limited to copyrights, in and to Orbis and any copies thereof are owned by Randle Taylor or its suppliers. All title and intellectual property rights in and to the content which may be accessed through use of Orbis is the property of the respective content owner and may be protected by applicable copyright or other intellectual property laws and treaties. This EULA grants you no rights to use such content. All rights not expressly granted are reserved by Randle Taylor. 
 
 5. NO WARRANTIES
-Randle Taylor expressly disclaims any warranty for the SOFTWARE PRODUCT. The SOFTWARE PRODUCT is provided ?As Is? without any express or implied warranty of any kind, including but not limited to any warranties of merchantability, noninfringement, or fitness of a particular purpose. Randle Taylor does not warrant or assume responsibility for the accuracy or completeness of any information, text, graphics, links or other items contained within the SOFTWARE PRODUCT. Randle Taylor makes no warranties respecting any harm that may be caused by the transmission of a computer virus, worm, time bomb, logic bomb, or other such computer program. Randle Taylor further expressly disclaims any warranty or representation to Authorized Users or to any third party.
+Randle Taylor expressly disclaims any warranty for Orbis. Orbis is provided as is without any express or implied warranty of any kind, including but not limited to any warranties of merchantability, noninfringement, or fitness of a particular purpose. Randle Taylor does not warrant or assume responsibility for the accuracy or completeness of any information, text, graphics, links or other items contained within Orbis. Randle Taylor makes no warranties respecting any harm that may be caused by the transmission of a computer virus, worm, time bomb, logic bomb, or other such computer program. Randle Taylor further expressly disclaims any warranty or representation to Authorized Users or to any third party.
 
 6. LIMITATION OF LIABILITY
-In no event shall Randle Taylor be liable for any damages (including, without limitation, lost profits, business interruption, or lost information) rising out of ?Authorized Users' use of or inability to use the SOFTWARE PRODUCT, even if Randle Taylor has been advised of the possibility of such damages. In no event will Randle Taylor be liable for loss of data or for indirect, special, incidental, consequential (including lost profit), or other damages based in contract, tort or otherwise. Randle Taylor shall have no liability with respect to the content of the SOFTWARE PRODUCT or any part thereof, including but not limited to errors or omissions contained therein, libel, infringements of rights of publicity, privacy, trademark rights, business interruption, personal injury, loss of privacy, moral rights or the disclosure of confidential information.
+In no event shall Randle Taylor be liable for any damages (including, without limitation, lost profits, business interruption, or lost information) rising out of authorized users' use of or inability to use Orbis, even if Randle Taylor has been advised of the possibility of such damages. In no event will Randle Taylor be liable for loss of data or for indirect, special, incidental, consequential (including lost profit), or other damages based in contract, tort or otherwise. Randle Taylor shall have no liability with respect to the content of Orbis or any part thereof, including but not limited to errors or omissions contained therein, libel, infringements of rights of publicity, privacy, trademark rights, business interruption, personal injury, loss of privacy, moral rights or the disclosure of confidential information.
+
+
+
+Orbis makes use of the following python packages (subject to the licenses given below):
+
+==matplotlib==
+
+License agreement for matplotlib 0.98.5.2
+
+1. This LICENSE AGREEMENT is between John D. Hunter (“JDH”), and the Individual or Organization (“Licensee”) accessing and otherwise using matplotlib software in source or binary form and its associated documentation.
+
+2. Subject to the terms and conditions of this License Agreement, JDH hereby grants Licensee a nonexclusive, royalty-free, world-wide license to reproduce, analyze, test, perform and/or display publicly, prepare derivative works, distribute, and otherwise use matplotlib 0.98.5.2 alone or in any derivative version, provided, however, that JDH’s License Agreement and JDH’s notice of copyright, i.e., “Copyright (c) 2002-2008 John D. Hunter; All Rights Reserved” are retained in matplotlib 0.98.5.2 alone or in any derivative version prepared by Licensee.
+
+3. In the event Licensee prepares a derivative work that is based on or incorporates matplotlib 0.98.5.2 or any part thereof, and wants to make the derivative work available to others as provided herein, then Licensee hereby agrees to include in any such work a brief summary of the changes made to matplotlib 0.98.5.2.
+
+4. JDH is making matplotlib 0.98.5.2 available to Licensee on an “AS IS” basis. JDH MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED. BY WAY OF EXAMPLE, BUT NOT LIMITATION, JDH MAKES NO AND DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF MATPLOTLIB 0.98.5.2 WILL NOT INFRINGE ANY THIRD PARTY RIGHTS.
+
+5. JDH SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF MATPLOTLIB 0.98.5.2 FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS A RESULT OF MODIFYING, DISTRIBUTING, OR OTHERWISE USING MATPLOTLIB 0.98.5.2, OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+
+6. This License Agreement will automatically terminate upon a material breach of its terms and conditions.
+
+7. Nothing in this License Agreement shall be deemed to create any relationship of agency, partnership, or joint venture between JDH and Licensee. This License Agreement does not grant permission to use JDH trademarks or trade name in a trademark sense to endorse or promote products or services of Licensee, or any third party.
+
+8. By copying, installing or otherwise using matplotlib 0.98.5.2, Licensee agrees to be bound by the terms and conditions of this License Agreement.
+
+
+==Numpy/Scipy==
+Copyright (c) 2001, 2002 Enthought, Inc.
+All rights reserved.
+
+Copyright (c) 2003-2009 SciPy Developers.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+  a. Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+  b. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+  c. Neither the name of the Enthought nor the names of its contributors
+     may be used to endorse or promote products derived from this software
+     without specific prior written permission.
+
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+DAMAGE.
+
+
+==pyyaml==
+
+1. This LICENSE AGREEMENT is between Stephen S. Howell ("Author"), 						
+and the Individual or Organization ("Licensee") accessing and						
+otherwise using PyYaml software in source or binary form and its						
+associated documentation.						
+						
+2. Subject to the terms and conditions of this License Agreement, Author						
+hereby grants Licensee a nonexclusive, royalty-free, world-wide						
+license to reproduce, analyze, test, perform and/or display publicly,						
+prepare derivative works, distribute, and otherwise use PyYaml						
+alone or in any derivative version, provided, however, that Author's						
+License Agreement and Author's notice of copyright, i.e., "Copyright (c)						
+2001 Steve Howell and Friends; All Rights Reserved" are never removed						
+from PyYaml, and are included in any derivative version prepared by Licensee.						
+						
+3. In the event Licensee prepares a derivative work that is based on						
+or incorporates PyYaml or any part thereof, and wants to make						
+the derivative work available to others as provided herein, then						
+Licensee hereby agrees to include in any such work a brief summary of						
+the changes made to PyYaml.						
+						
+4. Author is making PyYaml available to Licensee on an "AS IS"						
+basis.  Author MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR						
+IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, Author MAKES NO AND						
+DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS						
+FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF PyYaml WILL NOT						
+INFRINGE ANY THIRD PARTY RIGHTS.						
+						
+5. Author SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF PYTHON						
+2.2 FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS						
+A RESULT OF MODIFYING, DISTRIBUTING, OR OTHERWISE USING PYTHON 2.2,						
+OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.						
+						
+6. This License Agreement will automatically terminate upon a material						
+breach of its terms and conditions.						
+						
+7. Nothing in this License Agreement shall be deemed to create any						
+relationship of agency, partnership, or joint venture between Author and						
+Licensee.  This License Agreement does not grant permission to use Author						
+trademarks or trade name in a trademark sense to endorse or promote						
+products or services of Licensee, or any third party.						
+						
+8. By copying, installing or otherwise using PyYaml, Licensee						
+agrees to be bound by the terms and conditions of this License						
+Agreement.						
+
+==psyco==
+Psyco is distributed under the MIT License.
+
+Copyright (c) 2001-2003 Armin Rigo
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
