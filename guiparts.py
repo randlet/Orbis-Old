@@ -579,6 +579,33 @@ class AtomAtomPolarizabilityMatrix(ResultsMatrix):
             self.setData(data)
 
 
+class NetChargeMatrix(ResultsMatrix):
+
+    def __init__(self, parent, data_name,ID=-1, label="", pos=wx.DefaultPosition, size=(100, 25),row_labels=[],col_labels=[]): 
+        self.data_name = data_name
+        ResultsMatrix.__init__(self, parent, ID=ID, label=label, pos=pos, size=size,row_labels=row_labels,col_labels=col_labels)
+
+        
+    def refreshFromHuckel(self,event):
+
+        data = self.solver.net_charges
+        na = self.solver.getSize()
+        self.setSize(1,na)
+        disp_data = numpy.mat(numpy.zeros((1,na),float))
+        if len(data)>0:
+            
+            col_labels = ["Atom\n%d" % (x+1)for x in range(len(data))]
+            row_labels = ["Net Charge"]
+            
+            for ii in range(na):
+                val = data[ii]
+                disp_data[0,ii] = val if abs(val) > settings.eps else 0.0
+                    
+            self.setLabels(row_labels,col_labels)
+            print disp_data
+            self.setData(disp_data)
+
+            
 class AtomBondPolarizabilityMatrix(ResultsMatrix):
 
     def __init__(self, parent, data_name,ID=-1, label="", pos=wx.DefaultPosition, size=(100, 25),row_labels=[],col_labels=[]): 

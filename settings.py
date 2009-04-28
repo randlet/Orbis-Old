@@ -3,10 +3,13 @@ import sys
 root = os.path.dirname(os.path.abspath(sys.argv[0]))
 logfilen = logfile = root+'/simple_huckel.log'
 logfile = open(logfilen,'w')
-sys.stdout = logfile
+#sys.stdout = logfile
 
 logfile.write(sys.argv[0])
 logfile.flush()
+
+website = "http://www.simplehuckel.com"
+timebomb = (2009,6,1)
 
 from molecule import Atom,Bond
 import yaml

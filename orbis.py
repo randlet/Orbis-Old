@@ -69,14 +69,18 @@ class MainFrame(wx.Frame):
         #eigenvalue/vectors tab 
         self.results_display_eig = wx.Panel(self.results_display) 
         self.eigen_matrix = EigenMatrix(self.results_display_eig,-1,size=(300,270),label="eigen matrix")
-
-
         self.huckel_solver.addListener(self.eigen_matrix.refreshFromHuckel)
 
+        #pibond orders
         self.results_display_pibond = wx.Panel(self.results_display)
         self.pibond_matrix = PiBondMatrix(self.results_display_pibond,-1,size=(300,270),label="pibond matrix")
         self.huckel_solver.addListener(self.pibond_matrix.refreshFromHuckel)
 
+        #net atomic charges
+        self.results_display_charge = wx.Panel(self.results_display)
+        self.net_charge = NetChargeMatrix(self.results_display_charge,-1,size=(300,270),label="net charges")
+        self.huckel_solver.addListener(self.net_charge.refreshFromHuckel)
+        
         #atom-atom and atom-bond polarizabilities tab
         self.results_display_pol = wx.Panel(self.results_display)
         self.atom_atom_matrix = AtomAtomPolarizabilityMatrix(self.results_display_pol,-1,size=(300,270),label="atom atom")
@@ -100,8 +104,19 @@ class MainFrame(wx.Frame):
         self.CreateStatusBar()
         
         self.doLayout()
+        self.checkTimeBomb()
         # end wxGlade
 
+    def checkTimeBomb(self):
+        import datetime
+        to = datetime.date.today()
+
+        tf = datetime.date(*settings.timebomb)
+        if int(str(tf - to).split(' ')[0])<0:
+            wx.MessageBox("We're sorry but this Orbis beta version has expired. Please visit %s to download the latest beta." % (settings.website),"Trial Expired",style=wx.OK)
+            self.Close()
+
+        
     def basisSizeChange(self,event):
         pass
         
@@ -385,7 +400,9 @@ class MainFrame(wx.Frame):
             self.results_sizer.Show(self.results_display_2dmo,recursive=True)
             self.controls.basis_size.Enable(False)
             self.controls.atom_type.Enable(True)
-
+            if self.results_display.GetPageCount()<4:
+                self.results_display.AddPage(self.results_display_pol,"A-A Polarizabilities")
+                self.results_display.AddPage(self.results_display_atom_bond_pol,"A-B Polarizabilities")
         else:
             self.visual_mode.Check(False)
             self.huckel_solver.removeListener(self.sketch_pad.refreshFromHuckel)
@@ -396,6 +413,13 @@ class MainFrame(wx.Frame):
             self.results_sizer.Hide(self.results_display_2dmo,recursive=True)
             self.controls.basis_size.Enable(True)
             self.controls.atom_type.Enable(False)
+
+            self.results_display.RemovePage(3)            
+            self.results_display.RemovePage(2)
+#            self.results_display_atom_bond_pol.Hide()
+            self.results_display_pol.Hide()
+
+            
         self.Layout()            
         
     def onVisualMode(self,event):
@@ -514,7 +538,14 @@ class MainFrame(wx.Frame):
         self.results_display_pibond.SetSizer(pib_sizer)
         self.pibond_matrix.SetSize(self.results_display.GetPage(0).GetSize())
 
-        self.results_display.AddPage(self.results_display_pol, "Atom-Atom Polarizabilities")
+        self.results_display.AddPage(self.results_display_charge,"Net Charges")
+        nc_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        nc_sizer.Add(self.pibond_matrix,1,wx.EXPAND)
+        self.results_display_charge.SetSizer(nc_sizer)
+        self.net_charge.SetSize(self.results_display.GetPage(0).GetSize())
+
+        
+        self.results_display.AddPage(self.results_display_pol, "A-A Polarizabilities")
         pol_sizer = wx.BoxSizer(wx.HORIZONTAL)
         pol_sizer.Add(self.atom_atom_matrix,1,wx.EXPAND)
         self.results_display_pol.SetSizer(pol_sizer)
@@ -527,7 +558,7 @@ class MainFrame(wx.Frame):
         self.results_display_atom_bond_pol.SetSizer(pol_sizer2)
         self.atom_bond_matrix.SetSize(self.results_display.GetPage(0).GetSize())        
 
-        self.results_display.AddPage(self.results_display_atom_bond_pol, "Atom-Bond Polarizabilities")
+        self.results_display.AddPage(self.results_display_atom_bond_pol, "A-B Polarizabilities")
         
         results_sizer.Add(self.results_display, 1, wx.EXPAND, 5)
 
@@ -549,7 +580,10 @@ class MainFrame(wx.Frame):
 
 if __name__ == "__main__":
 
-    try:
+#    try:
+        
+
+
         import settings
         import huckelsolver
 
@@ -568,7 +602,7 @@ if __name__ == "__main__":
         main_frame.Show()
         app.MainLoop()
         
-    except:
-        print sys.exc_info()
-    finally:
-        settings.logfile.close()
+ #   except:
+ #       print sys.exc_info()
+ #   finally:
+ #       settings.logfile.close()
