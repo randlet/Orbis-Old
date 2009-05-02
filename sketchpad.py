@@ -47,6 +47,8 @@ class AtomTypeDialog(wx.Dialog):
         main_sizer.Add(button_sizer,-1,wx.ALL|wx.ALIGN_RIGHT,5)
         self.SetSizer(main_sizer)
         self.Fit()
+        self.hx.SetFocus()
+        self.hx.SelectAll()
         
     def onAtomType(self,event):
         atom_type = Atom.ATOM_TYPES[self.atom_type.GetValue()]
@@ -80,7 +82,8 @@ class BondTypeDialog(wx.Dialog):
         main_sizer.Add(button_sizer,-1,wx.ALL|wx.ALIGN_RIGHT,5)
         self.SetSizer(main_sizer)
         self.Fit()
-        
+        self.k_xy.SetFocus()
+        self.k_xy.SelectAll()
 #===================================================================================================
 class MoleculePlotPanel(PlotPanel):
     """Plots several lines in distinct colors."""

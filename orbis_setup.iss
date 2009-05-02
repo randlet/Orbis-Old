@@ -7,7 +7,7 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{70C1BF62-DE5E-4402-A317-C8043AB2FDE4}
 AppName=Orbis
-AppVerName=Orbis 0.1.3
+AppVerName=Orbis 0.1.5
 AppPublisher=Randle Taylor
 AppPublisherURL=http://www.simplehuckel.com
 AppSupportURL=http://www.simplehuckel.com
@@ -16,7 +16,7 @@ DefaultDirName={pf}\Orbis
 DefaultGroupName=Orbis
 AllowNoIcons=yes
 LicenseFile=C:\git\orbis\dist\license.txt
-OutputBaseFilename=install_orbis_0.1.3
+OutputBaseFilename=install_orbis_0.1.5
 Compression=lzma
 SolidCompression=yes
 

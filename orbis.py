@@ -95,7 +95,7 @@ class MainFrame(wx.Frame):
         self.huckel_solver.addListener(self.basisSizeChange)
         
         self.file_name = None
-        
+        self.SetTitle('Orbis - Simple Huckel Solver: Untitled')
         self.Bind(wx.EVT_KEY_DOWN,self.onKeyPressBasis)
         self.Bind(wx.EVT_IDLE,self.huckel_solver.update)
 
@@ -345,6 +345,7 @@ class MainFrame(wx.Frame):
         import pickle
         file_dlg = wx.FileDialog(self,"Choose a saved session file",wildcard="*.huc")
         result = file_dlg.ShowModal()
+        self.setLevelPointer(0)
 
         if result == wx.ID_OK:
 
@@ -387,7 +388,7 @@ class MainFrame(wx.Frame):
              #   wx.MessageBox("Error while loading %s" % file_dlg.GetFilename(),style = wx.ICON_ERROR)
                 
         file_dlg.Destroy()
-        
+        self.SetTitle('Orbis - Simple Huckel Solver: %s' % (self.file_name))
     def setVisualMode(self,vis_mode=True):
         if vis_mode:
         
@@ -493,19 +494,19 @@ class MainFrame(wx.Frame):
                     self.saveFile(fname)
                     
         save_dlg.Destroy()
-        
+        self.SetTitle('Orbis - Simple Huckel Solver: %s' % (self.file_name))
     def OnSave(self,event):
         if self.file_name == None:
             self.OnSaveAs(event)
         else:
             self.saveFile(self.file_name)
-            
+            self.SetTitle('Orbis - Simple Huckel Solver: %s' % (self.file_name))
     def OnNew(self,event):
         do_new = wx.MessageBox("Any unsaved work will be lost.  Do you want to start a new session?","New Session?",style=wx.YES_NO)
         if do_new == wx.YES:
             self.file_name = None
             self.controls.onClear(None)
-        
+            self.SetTitle('Orbis - Simple Huckel Solver: Untitled')
         
     def OnQuit(self,event):
         
@@ -572,15 +573,13 @@ class MainFrame(wx.Frame):
         self.setVisualMode(True)
         self.Layout()
         self.Maximize()
-        
-        # end wxGlade
-
-# end of class MainFrame
+        icon1 = wx.Icon(settings.icon_file, wx.BITMAP_TYPE_ICO)
+        self.SetIcon(icon1)        
 
 
 if __name__ == "__main__":
 
-    try:
+#    try:
         
 
 
@@ -597,12 +596,14 @@ if __name__ == "__main__":
         psyco.full()
         app = wx.PySimpleApp(0)
         wx.InitAllImageHandlers()
-        main_frame = MainFrame(None, -1, "Simple Huckel Solver")
+        main_frame = MainFrame(None, -1, "Orbis - Simple Huckel Solver")
+
+        
         app.SetTopWindow(main_frame)
         main_frame.Show()
         app.MainLoop()
         
-    except:
-        print sys.exc_info()
-    finally:
-        settings.logfile.close()
+    #except:
+        #print sys.exc_info()
+    #finally:
+        #settings.logfile.close()

@@ -10,7 +10,8 @@ import settings
 #import pylab
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg
 from matplotlib.figure import Figure
-import pylab
+import matplotlib
+#import pylab
 
 from molecule import Atom
 import numpy
@@ -81,6 +82,7 @@ class ELDPlotPanel (PlotPanel):
     def __init__( self, parent,**kwargs ):
 
         self.tooltip = TimedToolTip(settings.tool_tip_time,tip='tip with a long %s line and a newline\n' % (' '*100))
+        self.tooltip.SetTip('Left-Click on energy level to see corresponding orbital diagram and eigenvector')
         self.tooltip.Enable(False)
         self._redrawFlag = True
         self.tooltip.SetDelay(500)
@@ -133,7 +135,7 @@ class ELDPlotPanel (PlotPanel):
         
     def getDegenLevels(self):
         #if energies are within this % then they are considered splitting of a single level
-        level_delta = 0.15
+        level_delta = 0.001
         
         last_energy = self.levels[0][0]
 
@@ -196,8 +198,11 @@ class ELDPlotPanel (PlotPanel):
             max_width = 0.
             level_idx = 0
             level_pointer = self.GetParent().level_pointer
+
+           
             
             degen_levels = self.getDegenLevels()           
+            
             for levels in degen_levels:                    
 
                 energy= levels[0][0]
@@ -215,39 +220,85 @@ class ELDPlotPanel (PlotPanel):
                     x = numpy.arange(s,f+step,step)
                     y = [energy]*len(x)
                 
+
+                    fmt = self.getFmt(ne)
+                    
                     if level_idx == level_pointer:
-                        fmt = 'ro-'
+                        fmt += 'o'
+                        markersize = 8
                     else:
-                        fmt = 'k'
-    
-                    self.subplot.plot( [x[0],x[-1]], [y[0],y[-1]],fmt,picker=self.PICK_TOLERANCE)
-    
+                        markersize = 1
+#                    else:
+#                        fmt = '-'
+
+#                    if ne == 2:
+#                        fmt += 'r'
+#                        arrows = [ [x[1],energy-arrow_height/2.,1], [x[3],energy+arrow_height/2.,1]]
+#                    elif 1 < ne <2:
+#                        fmt += '-g'
+#                        arrows = [ [x[1],energy-arrow_height/2.,1], [x[3],energy+arrow_height*(ne-1.)/2.,ne-1.]]
+#                    elif 0<ne <= 1:
+#                        fmt += 'b'
+#                    elif ne <settings.eps:
+#                        fmt += 'k'
+#                        arrows = [ [x[2],energy-arrow_height/2.,ne]]                    
+                        
+
+                    self.subplot.plot( [x[0],x[-1]], [y[0],y[-1]],fmt,picker=self.PICK_TOLERANCE,linewidth = 2,markersize=markersize)
+
                     arrows = []
     
-                    if ne == 2:
-                        arrows = [ [x[1],energy-arrow_height/2.,1], [x[3],energy+arrow_height/2.,1]]
-                    elif 1 < ne <2:
-                        arrows = [ [x[1],energy-arrow_height/2.,1], [x[3],energy+arrow_height*(ne-1.)/2.,ne-1.]]
-                    elif 0<ne <= 1:
-                        arrows = [ [x[2],energy-arrow_height/2.,ne]]                    
     
                     dir = 1.
-                    for ar in arrows:
-                        dy = dir*arrow_height*ar[2]
-                        if dir >0:
-                            fc = 'c'
-                        else:
-                            fc = 'r'
+                    #for ar in arrows:
+                        #dy = dir*arrow_height*ar[2]
+                        #if dir >0:
+                            #fc = 'c'
+                        #else:
+                            #fc = 'r'
                         
-                        arr = pylab.Arrow(ar[0],ar[1],0,dy,edgecolor='white',facecolor=fc,width=arrow_width)
-                        dir *= -1.
-                        self.subplot.add_patch(arr) 
+                        #arr = pylab.Arrow(ar[0],ar[1],0,dy,edgecolor='white',facecolor=fc,width=arrow_width)
+                        #dir *= -1.
+                        #self.subplot.add_patch(arr) 
                     level_idx += 1
+
+            self.drawLegend()
+
             
             max_width = max(8,max_width)
             self.subplot.axis([-1.2*max_width/2.,1.2*max_width/2.,min_energy,max_energy])
-        
+
+            
         self.canvas.draw()
+
+    def getFmt(self,ne=-1):
+        fmts = (('.w','Filling:'),('k-','N=0'),('b--','0<N<1'),('b-','N=1'),('r--','1<N<2'),('r-','N=2'))                                        
+        if ne <0:
+            return fmts
+        elif ne <settings.eps:
+            return fmts[1][0]
+        elif 0<ne < 1:
+            return fmts[2][0]
+        elif abs(ne-1)<settings.eps:
+            return fmts[3][0]
+        elif 1 < ne <2:
+            return fmts[4][0]
+        else :
+            return fmts[5][0]
+
+ 
+
+        
+    
+    def drawLegend(self):
+
+
+        [self.subplot.plot([-999],[0],fmt[0],label=fmt[1],linewidth=3) for fmt in self.getFmt()]
+            
+        font = matplotlib.font_manager.FontProperties(size=10)
+        legend = self.subplot.legend(loc=8,ncol=3,prop=font,columnspacing=1,markerscale=4)
+        legend.draw_frame(False)
+        
 
 
 class HuckelMatrix(wx.grid.Grid):
@@ -533,6 +584,7 @@ class ResultsMatrix(wx.grid.Grid):
                     self.SetCellValue(ii,jj, self.FMT %(val))
                     self.SetReadOnly(ii,jj,True)
 
+        self.AutoSizeRows()
         self.AutoSizeColumns()
         
     def setSize(self,row_size,col_size=-1):

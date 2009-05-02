@@ -10,7 +10,7 @@ import sys, os, py2exe
 # includes:     List of modules to include
 # packages:     List of packages to include
 data_files = []
-excludes = [ 'numarray', 'Numeric', 'Tkinter', 'email','wxPython']
+excludes = [ 'numarray', 'Numeric', 'Tkinter', 'email','wxPython','OpenGL',"enthought","vtk",'vpython']
 dll_excludes = [] # dlls to exclude
 includes = [ 'matplotlib', 'wx', 'numpy', ]
 packages = []  # May want 'wx' in packages if creating a generic environment
@@ -37,17 +37,17 @@ c_runtime = pythonpath+"/MSVCR71.DLL"
 cpp_runtime = pythonpath+"/MSVCP71.DLL"
 data_files += [('.',[c_runtime,cpp_runtime])]
                #C:\Python25\code\huckel\data
-
-atomic_data = 'C:\Python25/code/huckel/data/atomic_data.yaml'
-bond_data = 'C:\Python25/code/huckel/data/bond_data.yaml'
-def_atomic_data = 'C:\Python25/code/huckel/data/default/atomic_data.yaml'
-def_bond_data = 'C:\Python25/code/huckel/data/default/bond_data.yaml'
+root = 'C:\git/orbis'
+atomic_data = root+'/data/atomic_data.yaml'
+bond_data = root+'/data/bond_data.yaml'
+def_atomic_data = root+'/data/default/atomic_data.yaml'
+def_bond_data = root+'/data/default/bond_data.yaml'
 data_files += [('./data',[atomic_data,bond_data]),('./data/default',[def_atomic_data,def_bond_data])]
 
-image_dir = 'C:\Python25/code/huckel/images'
-image_files = [image_dir + x for x in ['/new.png','/open.png','/save.png']]
+image_dir = root+'/images'
+image_files = [image_dir + x for x in ['/new.png','/open.png','/save.png','/icon.bmp']]
 data_files += [('./images',image_files)]
-data_files += [('.',['C:\Python25/code/huckel/license.txt'])]
+data_files += [('.',[root+'/license.txt'])]
 # End of configuration
 
 
@@ -66,7 +66,7 @@ manifestVersion="1.0">
     name="Controls"
     type="win32"
 />
-<description>Orbis - Simple Huckel Solver</description>
+<description>Orbis - Simple Huckel Solver: Beta v0.1.5</description>
 <dependency>
     <dependentAssembly>
         <assemblyIdentity
@@ -87,7 +87,7 @@ setup(
     windows = [
         {
             "script": "orbis.py",
-            "icon_resources": [(1, "pyc.ico")],
+            "icon_resources": [(1, "icon.ico")],
             "other_resources": [(24,1,manifest)]
         }
     ],
@@ -96,62 +96,3 @@ setup(
     #zipfile = None,  # Bundle library.zip with the executable
     )
 
-###!/usr/bin/python
-##
-##from distutils.core import setup
-##import py2exe
-##
-##from distutils.filelist import findall
-##import os
-##import matplotlib
-####matplotlibdatadir = matplotlib.get_data_path()
-####matplotlibdata = findall(matplotlibdatadir)
-####matplotlibdata_files = []
-####for f in matplotlibdata:
-####    dirname = os.path.join('matplotlibdata', f[len(matplotlibdatadir)+1:])
-####    matplotlibdata_files.append((os.path.split(dirname)[0], [f]))
-##
-##
-##manifest = """
-##<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-##<assembly xmlns="urn:schemas-microsoft-com:asm.v1"
-##manifestVersion="1.0">
-##<assemblyIdentity
-##    version="0.64.1.0"
-##    processorArchitecture="x86"
-##    name="Controls"
-##    type="win32"
-##/>
-##<description>FM A-FM Fitter</description>
-##<dependency>
-##    <dependentAssembly>
-##        <assemblyIdentity
-##            type="win32"
-##            name="Microsoft.Windows.Common-Controls"
-##            version="6.0.0.0"
-##            processorArchitecture="X86"
-##            publicKeyToken="6595b64144ccf1df"
-##            language="*"
-##        />
-##    </dependentAssembly>
-##</dependency>
-##</assembly>
-##"""
-##
-##"""
-##installs manifest and icon into the .exe
-##but icon is still needed as we open it
-##for the window icon (not just the .exe)
-##changelog and logo are included in dist
-##"""
-##
-##setup(
-##    windows = [
-##        {
-##            "script": "main.py",
-##            "icon_resources": [(1, "pyc.ico")],
-##            "other_resources": [(24,1,manifest)]
-##        }
-##    ],
-##      data_files=["pyc.ico"].append(matplotlib.get_py2exe_datafiles())
-##)

@@ -3,7 +3,7 @@ import sys
 root = os.path.dirname(os.path.abspath(sys.argv[0]))
 logfilen = logfile = root+'/simple_huckel.log'
 logfile = open(logfilen,'w')
-sys.stdout = logfile
+#sys.stdout = logfile
 
 logfile.write(sys.argv[0])
 logfile.flush()
@@ -21,6 +21,7 @@ eps = 1.E-12
 
 
 image_dir = root+'/images'
+icon_file = image_dir+'/icon.bmp'
 #name of subfolder where molecular and atomic data are held
 data_dir_name = root+'/data'
 

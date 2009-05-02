@@ -3,6 +3,7 @@ import math
 import settings        
 import time 
 import wx
+import matplotlib
 
 #===================================================================================================
 class EigenPlotPanel(PlotPanel):
@@ -65,10 +66,10 @@ class EigenPlotPanel(PlotPanel):
         
     
     def addNewAtom(self,x,y,size=10):
-        if size < 0:
+        if size > 0:
             fmt = 'or'
         else:
-            fmt = 'oc'
+            fmt = 'ob'
         self.subplot.plot([x],[y],fmt,markersize=max(2,abs(size)))
     #------------------------------------------------------------------------------------------------                      
     def addNewBond(self,xcoords,ycoords):
@@ -87,10 +88,11 @@ class EigenPlotPanel(PlotPanel):
         else:
             self.subplot.clear()
             
-        if len(self.molecule.bond_stack)>0 and self.GetParent().visual_mode.IsChecked():
+        if len(self.molecule.atom_stack)>0 and self.GetParent().visual_mode.IsChecked():
             
             eigen_vecs = self.solver.eigen_vecs
             pointer = self.GetParent().level_pointer
+
 
             magnitudes = [int(50*x) for x in eigen_vecs[pointer]]
 
@@ -99,13 +101,24 @@ class EigenPlotPanel(PlotPanel):
 
             for ii,atom in enumerate(self.molecule.atom_stack):
                 self.addNewAtom(atom.x,atom.y,magnitudes[ii])
-
+            self.drawLegend()            
             self.relable_atoms()
             self.resize()
 
-        self.setPlotProperties()
 
+        self.setPlotProperties()
+        
         self.canvas.draw()
+        
+    def drawLegend(self):
+
+        fmts = (('.w','Sign of eigenvector coefficient:'),('ro','Ci > 0'),('bo','Ci < 0'),)                    
+        [self.subplot.plot([-999],[0],fmt[0],label=fmt[1],markersize=5) for fmt in fmts]
+            
+        font = matplotlib.font_manager.FontProperties(size=11)
+        legend = self.subplot.legend(loc=8,ncol=3,prop=font,columnspacing=1,numpoints=1,markerscale=400)
+        legend.draw_frame(False)
+        
 #------------------------------------------------------------------------------------------------                      
     def resize(self):
         
