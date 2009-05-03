@@ -65,39 +65,46 @@ class MainFrame(wx.Frame):
 
         #create results notebook
         self.results_display = wx.Notebook(self, -1, size=(400,300),style=wx.NO_BORDER)
+        self.huckel_solver.addListener(self.handleResultsRefreshFromHuckel)
 
+
+        self.panel_children = {}
         #eigenvalue/vectors tab 
-        self.results_display_eig = wx.Panel(self.results_display) 
+        self.results_display_eig = wx.Panel(self.results_display,name="eigen panel") 
         self.eigen_matrix = EigenMatrix(self.results_display_eig,-1,size=(300,270),label="eigen matrix")
-        self.huckel_solver.addListener(self.eigen_matrix.refreshFromHuckel)
+        self.panel_children["eigen panel"] = self.eigen_matrix
+#        self.huckel_solver.addListener(self.eigen_matrix.refreshFromHuckel)
 
         #pibond orders
-        self.results_display_pibond = wx.Panel(self.results_display)
+        self.results_display_pibond = wx.Panel(self.results_display,name="pibond panel")
         self.pibond_matrix = PiBondMatrix(self.results_display_pibond,-1,size=(300,270),label="pibond matrix")
-        self.huckel_solver.addListener(self.pibond_matrix.refreshFromHuckel)
+        self.panel_children["pibond panel"] = self.pibond_matrix
+#        self.huckel_solver.addListener(self.pibond_matrix.refreshFromHuckel)
 
         #net atomic charges
-        self.results_display_charge = wx.Panel(self.results_display)
+        self.results_display_charge = wx.Panel(self.results_display,name="charge panel")
         self.net_charge = NetChargeMatrix(self.results_display_charge,-1,size=(300,270),label="net charges")
-        self.huckel_solver.addListener(self.net_charge.refreshFromHuckel)
+        self.panel_children["charge panel"] = self.net_charge
+#        self.huckel_solver.addListener(self.net_charge.refreshFromHuckel)
         
         #atom-atom and atom-bond polarizabilities tab
-        self.results_display_pol = wx.Panel(self.results_display)
+        self.results_display_pol = wx.Panel(self.results_display,name="atom atom panel")
         self.atom_atom_matrix = AtomAtomPolarizabilityMatrix(self.results_display_pol,-1,size=(300,270),label="atom atom")
-        self.huckel_solver.addListener(self.atom_atom_matrix.refreshFromHuckel)
+        self.panel_children["atom atom panel"] = self.atom_atom_matrix
+#        self.huckel_solver.addListener(self.atom_atom_matrix.refreshFromHuckel)
 
         #atom-bond polarizabilities tab
-        self.results_display_atom_bond_pol = wx.Panel(self.results_display)
-
+        self.results_display_atom_bond_pol = wx.Panel(self.results_display,name= "atom bond panel")
         self.atom_bond_matrix = AtomBondPolarizabilityMatrix(self.results_display_atom_bond_pol,-1,size=(300,270),label="atom bond")
-        self.huckel_solver.addListener(self.atom_bond_matrix.refreshFromHuckel)
+        self.panel_children["atom bond panel"] = self.atom_bond_matrix
+#        self.huckel_solver.addListener(self.atom_bond_matrix.refreshFromHuckel)
 
         self.huckel_solver.addListener(self.basisSizeChange)
         
         self.file_name = None
         self.SetTitle('Orbis - Simple Huckel Solver: Untitled')
         self.Bind(wx.EVT_KEY_DOWN,self.onKeyPressBasis)
-        self.Bind(wx.EVT_IDLE,self.huckel_solver.update)
+#        self.Bind(wx.EVT_IDLE,self.huckel_solver.update)
 
         self.setupMenuBar()
         self.createToolBar()
@@ -105,7 +112,32 @@ class MainFrame(wx.Frame):
         
         self.doLayout()
         self.checkTimeBomb()
+        self.results_display.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED,self.OnNoteBookPage)        
         # end wxGlade
+        
+    def handleResultsRefreshFromHuckel(self):
+
+        
+        page_label = self.results_display.GetCurrentPage().GetName()
+
+        self.panel_children[self.results_display.GetCurrentPage().GetName()].refreshFromHuckel()
+
+    def OnNoteBookPage(self,event):
+
+        page_label = self.results_display.GetPage(event.GetSelection()).GetName()
+
+        page = self.panel_children[page_label]
+        page.refreshFromHuckel()
+        event.Skip()
+#        self.eigen_matrix
+#        if page_label == "eigen panel":
+#            self.eigen_matrix.refreshFromHuckel()
+            
+#        refreshFromHuckel()
+#        print page
+
+#        self.results_display.GetPage(page).refreshFromHuckel()
+        
 
     def checkTimeBomb(self):
         import datetime
@@ -117,7 +149,7 @@ class MainFrame(wx.Frame):
             self.Close()
 
         
-    def basisSizeChange(self,event):
+    def basisSizeChange(self):
         pass
         
     def setLevelPointer(self,level):
@@ -345,56 +377,93 @@ class MainFrame(wx.Frame):
         import pickle
         file_dlg = wx.FileDialog(self,"Choose a saved session file",wildcard="*.huc")
         result = file_dlg.ShowModal()
-        self.setLevelPointer(0)
+        self.level_pointer = 0
+#        self.setLevelPointer(0)
 
         if result == wx.ID_OK:
+    
 
-            #try:
+            try:
                 f= open(file_dlg.GetPath(),'rb')
                 session_dict = pickle.load(f)
                 f.close()
                 self.file_name = file_dlg.GetPath()
-                self.controls.onClear(None)
+
                 if session_dict["mode"] == "visual":
-                    
+
                     self.visual_mode.Check(True)
-                    for atom in session_dict["atoms"]:
+                    self.setVisualMode()                                        
+
+                    n_a = len(session_dict["atoms"])
+                    n_b = len(session_dict["bonds"])
+                    data = numpy.mat(numpy.zeros((n_a,n_a)),float)
+                    for ii, atom in enumerate(session_dict["atoms"]):
                         x,y,hx,sym = atom
+                        data[ii,ii] = hx
                         #make sure all atom types are present
-                        if sym not in Atom.ATOM_TYPES.keys():
-                            Atom.ATOM_TYPES[sym] = {settings.h_delim:hx,"description":sym}
+#                        if sym not in Atom.ATOM_TYPES.keys():
+#                            Atom.ATOM_TYPES[sym] = {settings.h_delim:hx,"description":sym}
                             
-                        self.sketch_pad.addNewAtom(x,y,hx,sym)
+#                        self.sketch_pad.addNewAtom(x,y,hx,sym)
+
                     for bond in session_dict["bonds"]:
                         con,k_xy = bond
-                        a = self.sketch_pad.molecule.atom_stack[con[0]].sym
-                        b = self.sketch_pad.molecule.atom_stack[con[1]].sym
-                        
-                        Bond.AddBond(a,b,k_xy)
-                        
-                        self.sketch_pad.addNewBond(con,k_xy)
+                        data[con[0],con[1]] = k_xy
+                        data[con[1],con[0]] = k_xy
 
-                    self.setVisualMode()
+
+                    self.sketch_pad.createFromHuckel(data,False)
+
+                    self.huckel_solver.setData(data,session_dict["num_e"])                        
+                    
+                    for ii,props in enumerate(session_dict["atoms"]):
+                        atom = self.sketch_pad.molecule.atom_stack[ii]
+                        atom.setData(*props)
+
+                        
+                    for ii,props in enumerate(session_dict["bonds"]):
+                        con,k_xy = props
+                        bond = self.sketch_pad.molecule.getBond(con[0],con[1])
+                        bond.k_xy = k_xy 
+                        bond.refresh()
+                        
+##                        make sure this bond exists int he bond types
+                        #Bond.AddBond(a,b,k_xy)
+
+                    self.sketch_pad.draw()
+                    self.eld.draw()
+                    self.results_display_2dmo.draw()
+
                     self.sketch_pad.resize()
                 else:
                     
-                    self.huckel_solver.setData(session_dict["data"])
+                    self.huckel_solver.setData(session_dict["data"],session_dict["num_e"])
                     #self.visual_mode.Check(False)
                     self.setVisualMode(False)
 
-                self.huckel_solver.setNumElectrons(session_dict["num_e"])
+#                self.huckel_solver.setNumElectrons(session_dict["num_e"])
                 
-            #except:
-             #   wx.MessageBox("Error while loading %s" % file_dlg.GetFilename(),style = wx.ICON_ERROR)
+            except:
+                wx.MessageBox("Error while loading %s" % file_dlg.GetFilename(),style = wx.ICON_ERROR)
                 
         file_dlg.Destroy()
         self.SetTitle('Orbis - Simple Huckel Solver: %s' % (self.file_name))
+        
     def setVisualMode(self,vis_mode=True):
         if vis_mode:
-        
-            self.visual_mode.Check(True)
-            self.huckel_solver.addListener(self.sketch_pad.refreshFromHuckel)
-            self.huckel_solver.addListener(self.results_display_2dmo.refreshFromHuckel)
+            self.visual_mode.Check(True)            
+            self.sketch_pad.reset()
+
+
+            self.huckel_solver.reset()
+
+
+#            if self.sketch_pad.refreshFromHuckel not in self.huckel_solver.listeners:
+#                self.huckel_solver.addListener(self.sketch_pad.refreshFromHuckel)
+
+#            if self.results_display_2dmo.refreshFromHuckel not in self.huckel_solver.listeners:
+#                self.huckel_solver.addListener(self.results_display_2dmo.refreshFromHuckel)
+                
             self.redraw.Enable(True)
             self.controls.minimize.Enable(True)
             self.main_sizer.Show(self.sketch_pad,recursive=True)
@@ -406,8 +475,12 @@ class MainFrame(wx.Frame):
                 self.results_display.AddPage(self.results_display_atom_bond_pol,"A-B Polarizabilities")
         else:
             self.visual_mode.Check(False)
-            self.huckel_solver.removeListener(self.sketch_pad.refreshFromHuckel)
-            self.huckel_solver.removeListener(self.results_display_2dmo.refreshFromHuckel)
+ #           if self.sketch_pad.refreshFromHuckel in self.huckel_solver.listeners:
+ #               self.huckel_solver.removeListener(self.sketch_pad.refreshFromHuckel)
+
+  #          if self.results_display_2dmo.refreshFromHuckel in self.huckel_solver.listeners:
+  #              self.huckel_solver.removeListener(self.results_display_2dmo.refreshFromHuckel)
+                
             self.redraw.Enable(False)
             self.controls.minimize.Enable(False)
             self.main_sizer.Hide(self.sketch_pad,recursive=True)
@@ -428,8 +501,6 @@ class MainFrame(wx.Frame):
         if self.visual_mode.IsChecked():
             if wx.MessageBox("Switching to visual mode will clear the current session. Are you sure you want to continue?","Visual mode",style=wx.YES_NO|wx.ICON_QUESTION) == wx.YES:
 
-                self.sketch_pad.reset()
-                self.huckel_solver.reset()
                 self.setVisualMode()
         else:
             self.setVisualMode(False)
@@ -462,8 +533,9 @@ class MainFrame(wx.Frame):
                 ai,bi = molecule.atom_stack.index(bond.a),molecule.atom_stack.index(bond.b)
                 bonds.append([(ai,bi),bond.k_xy])
         
-                session_dict["atoms"] = atoms
-                session_dict["bonds"] = bonds
+            session_dict["atoms"] = atoms
+            session_dict["bonds"] = bonds
+            
         else:
             session_dict["mode"] = "general"
             session_dict["data"] = self.huckel_solver.data
@@ -579,7 +651,7 @@ class MainFrame(wx.Frame):
 
 if __name__ == "__main__":
 
-#    try:
+    try:
         
 
 
@@ -603,7 +675,7 @@ if __name__ == "__main__":
         main_frame.Show()
         app.MainLoop()
         
-    #except:
-        #print sys.exc_info()
-    #finally:
-        #settings.logfile.close()
+    except:
+        print sys.exc_info()
+    finally:
+        settings.logfile.close()

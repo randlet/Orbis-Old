@@ -139,6 +139,12 @@ class AtomDraw(Atom):
     def setPos(self,x,y):
         self.x,self.y = x,y
         self.artist.set_data([x],[y])
+
+    def setData(self,x,y,hx,sym):
+        self.setPos(x,y)
+        self.hx = hx
+        self.sym = sym
+        self.artist.set_color(settings.COLOUR_LIST[sorted(Atom.ATOM_TYPES.keys()).index(self.sym)].lower())
         
 #===================================================================================================        
 class Molecule():

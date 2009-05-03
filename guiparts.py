@@ -94,10 +94,10 @@ class ELDPlotPanel (PlotPanel):
         self.Bind(wx.EVT_IDLE,self.tooltip._onIdle)
         
         
-    def refreshFromHuckel(self,event):
+    def refreshFromHuckel(self):
         self.levels = self.solver.populated_levels
-        self._redrawFlag = True
-        #self.draw()
+        self._redrawFlag = False
+        self.draw()
 
     def pickEvent(self,event):
 
@@ -155,7 +155,7 @@ class ELDPlotPanel (PlotPanel):
         return degen_levels
     
     def draw( self ):
-        
+
         if not hasattr( self, 'subplot' ):
             self.subplot = self.figure.add_subplot( 111 )
             self.figure.suptitle('Energy Level Diagram')
@@ -163,27 +163,27 @@ class ELDPlotPanel (PlotPanel):
             self.canvas.mpl_connect('pick_event',self.pickEvent)
             self.canvas.mpl_connect('motion_notify_event', self.mouseMove)            
             self.canvas.mpl_connect('axes_enter_event',self.axesEnter)
+            self.subplot.set_ylabel("Energy")
+            self.subplot.set_xticklabels([""])            
+            self.subplot.set_xticks([])            
+            self.drawLegend()
 
-            #matplotlib.axes.Axes.set_position
-
-        self.subplot.clear()
-        self.subplot.set_ylabel("Energy")
-#        self.subplot.set_position([0.175,0.1,0.8,0.8])
-        self.subplot.set_xticklabels([""])
-        self.subplot.set_xticks([])
+            self.width = 1.
+            self.space = 0.5*self.width
+            self.width_space = self.width+self.space
+            self.steps = 4
+            self.step = self.width/self.steps
+            self.height_fac = 0.2
+            
+        else:
+            for artist in self.subplot.get_children():
+                if isinstance(artist,matplotlib.lines.Line2D):
+                    artist.remove()
 
 
         if len(self.levels)>0:
-
-
-            width = 1.
-            space = 0.5*width
-
-            steps = 4
-            step = width/steps
-            height_fac = 0.2
             
-            de = (self.levels[-1][0]-self.levels[0][0])*height_fac 
+            de = (self.levels[-1][0]-self.levels[0][0])*self.height_fac 
             min_energy = self.levels[0][0] - de
             max_energy = self.levels[-1][0] + de
 
@@ -191,35 +191,27 @@ class ELDPlotPanel (PlotPanel):
                 min_energy -= 1.
                 max_energy += 1.
 
-            arrow_height = (max_energy-min_energy)*0.05#/(len(self.levels)*2)
-            arrow_width = 0.4
-            arrow_hwidth = 1.5
-                
-            max_width = 0.
+            max_widths = [8]
             level_idx = 0
             level_pointer = self.GetParent().level_pointer
-
-           
-            
             degen_levels = self.getDegenLevels()           
-            
+
             for levels in degen_levels:                    
 
                 energy= levels[0][0]
                 
                 n = len(levels)
-                total_width = n*width+(n-1)*space
+                total_width = n*(self.width_space)-self.space
 
-                max_width = max(max_width,total_width)
+                max_widths.append(total_width)
 
                 for ii in range(n):
-                    s = -total_width/2. + ii*(width+space)
-                    f = s+width
+                    s = -total_width*0.5 + ii*(self.width_space)
+                    f = s+self.width
                     ne = levels[ii][2]
                     
-                    x = numpy.arange(s,f+step,step)
+                    x = numpy.arange(s,f+self.step,self.step)
                     y = [energy]*len(x)
-                
 
                     fmt = self.getFmt(ne)
                     
@@ -228,47 +220,14 @@ class ELDPlotPanel (PlotPanel):
                         markersize = 8
                     else:
                         markersize = 1
-#                    else:
-#                        fmt = '-'
 
-#                    if ne == 2:
-#                        fmt += 'r'
-#                        arrows = [ [x[1],energy-arrow_height/2.,1], [x[3],energy+arrow_height/2.,1]]
-#                    elif 1 < ne <2:
-#                        fmt += '-g'
-#                        arrows = [ [x[1],energy-arrow_height/2.,1], [x[3],energy+arrow_height*(ne-1.)/2.,ne-1.]]
-#                    elif 0<ne <= 1:
-#                        fmt += 'b'
-#                    elif ne <settings.eps:
-#                        fmt += 'k'
-#                        arrows = [ [x[2],energy-arrow_height/2.,ne]]                    
-                        
+                    self.subplot.plot( [x[0],x[-1]], [y[0],y[-1]],fmt,picker=self.PICK_TOLERANCE,linewidth = 1,markersize=markersize)
 
-                    self.subplot.plot( [x[0],x[-1]], [y[0],y[-1]],fmt,picker=self.PICK_TOLERANCE,linewidth = 2,markersize=markersize)
-
-                    arrows = []
-    
-    
-                    dir = 1.
-                    #for ar in arrows:
-                        #dy = dir*arrow_height*ar[2]
-                        #if dir >0:
-                            #fc = 'c'
-                        #else:
-                            #fc = 'r'
-                        
-                        #arr = pylab.Arrow(ar[0],ar[1],0,dy,edgecolor='white',facecolor=fc,width=arrow_width)
-                        #dir *= -1.
-                        #self.subplot.add_patch(arr) 
                     level_idx += 1
-
-            self.drawLegend()
-
             
-            max_width = max(8,max_width)
-            self.subplot.axis([-1.2*max_width/2.,1.2*max_width/2.,min_energy,max_energy])
+            max_width = max(max_widths)
+            self.subplot.axis([-0.6*max_width,0.6*max_width,min_energy,max_energy])
 
-            
         self.canvas.draw()
 
     def getFmt(self,ne=-1):
@@ -361,7 +320,7 @@ class HuckelMatrix(wx.grid.Grid):
             wx.TheClipboard.SetData(paster)
             wx.TheClipboard.Close()
 
-    def refreshFromHuckel(self,event):
+    def refreshFromHuckel(self):
 
         self.setSize(self.solver.getSize())
         
@@ -576,7 +535,7 @@ class ResultsMatrix(wx.grid.Grid):
                 val = data[ii,jj]
                 if abs(val)<settings.eps:
                     val = 0.0
-                
+
                 if reverse:
                     self.SetCellValue(size_ii-ii-1,jj, self.FMT %(val))
                     self.SetReadOnly(size_ii-ii-1,jj,True)
@@ -611,7 +570,7 @@ class ResultsMatrix(wx.grid.Grid):
             diff = abs(diff)
             self.DeleteRows(cur_size-diff,diff,updateLabels=False)
         
-    def refreshFromHuckel(self,event):
+    def refreshFromHuckel(self):
         pass
 
 
@@ -620,13 +579,11 @@ class AtomAtomPolarizabilityMatrix(ResultsMatrix):
     def __init__(self, parent, ID=-1, label="", pos=wx.DefaultPosition, size=(100, 25),row_labels=[],col_labels=[]): 
         ResultsMatrix.__init__(self, parent, ID=ID, label=label, pos=pos, size=size,row_labels=row_labels,col_labels=col_labels)
 
-    def refreshFromHuckel(self,event):
+    def refreshFromHuckel(self):
         self.setSize(self.solver.getSize())
-        #data = self.solver.aa_polar
-        data = self.solver._calcAAPolarizability()
-        if len(data)>0:
+        data = self.solver._calcAAPolarizability() #aa_polar
 
-            #row_labels = ["E = " +x for x in map(lambda x : "%5.3f" % (x),self.solver.eigen_vals)]
+        if len(data)>0:
             self.setLabels()
             self.setData(data)
 
@@ -638,9 +595,9 @@ class NetChargeMatrix(ResultsMatrix):
         ResultsMatrix.__init__(self, parent, ID=ID, label=label, pos=pos, size=size,row_labels=row_labels,col_labels=col_labels)
 
         
-    def refreshFromHuckel(self,event):
+    def refreshFromHuckel(self):
 
-        data = self.solver.net_charges
+        data = self.solver._calcNetCharges()#net_charges
         na = self.solver.getSize()
         if na >= 1:
             self.setSize(1,na)
@@ -655,7 +612,7 @@ class NetChargeMatrix(ResultsMatrix):
             
             for ii in range(na):
                 val = data[ii]
-                disp_data[0,ii] = val if abs(val) > settings.eps else 0.0
+                disp_data[0,ii] = val 
                     
             self.setLabels(row_labels,col_labels)
 
@@ -672,6 +629,7 @@ class AtomBondPolarizabilityMatrix(ResultsMatrix):
     
         #calculate atom bond polarizability when required
         data = self.solver._calcABPolarizability()
+#        data = self.solver.ab_polar
         na,nb = self.solver.getSize(),self.solver.getNumBonds()
         disp_data = numpy.mat(numpy.zeros((na,nb),float))
         if len(data)>0:
@@ -682,13 +640,13 @@ class AtomBondPolarizabilityMatrix(ResultsMatrix):
             for ii in range(na):
                 for jj in range(nb):
                     val = data[ii][jj][2]
-                    disp_data[ii,jj] = val if abs(val) > settings.eps else 0.0
+                    disp_data[ii,jj] = val
                     
             self.setLabels(row_labels,col_labels)
         
             self.setData(disp_data)
         
-    def refreshFromHuckel(self,event):
+    def refreshFromHuckel(self):
         self.setSize(self.solver.getSize(),self.solver.getNumBonds())
         self.createData()
 
@@ -716,7 +674,7 @@ class EigenMatrix(ResultsMatrix):
         if event.GetEventType() == wx.grid.EVT_GRID_SELECT_CELL.evtType[0]:
             event.Skip()
 
-    def refreshFromHuckel(self,event):
+    def refreshFromHuckel(self):
         self.setSize(self.solver.getSize())
         vecs = self.solver.eigen_vecs
         count = len(vecs)
@@ -736,13 +694,14 @@ class PiBondMatrix(ResultsMatrix):
 
         ResultsMatrix.__init__(self, parent, ID=ID, label=label, pos=pos, size=size,row_labels=row_labels,col_labels=col_labels)
 
-    def refreshFromHuckel(self,event):
+    def refreshFromHuckel(self):
+
         self.setSize(self.solver.getSize())
-        data = self.solver.bond_orders
-        if data.any():
-            #row_labels = ["E = " +x for x in map(lambda x : "%5.3f" % (x),self.solver.getEigenVals())]
-            self.setLabels()
-            self.setData(data)
+#        data = self.solver.bond_orders
+        data = self.solver._calcBondOrders()
+#        if data.any():
+        self.setLabels()
+        self.setData(data)
 
 
 class ControlPanel(wx.Panel): 
@@ -812,7 +771,7 @@ class ControlPanel(wx.Panel):
         self.GetParent().sketch_pad.current_atom_type = atype
         
     def onClear(self,event):
-        
+
         self.solver.reset()
         if self.GetParent().visual_mode.IsChecked():
             self.sketch_pad.reset()
@@ -845,7 +804,7 @@ class ControlPanel(wx.Panel):
         #data = numpy.matrix(numpy.zeros((size,size),float))
         
         self.solver.setData(data)
-        self.solver.setNumElectrons(size)
+        #self.solver.setNumElectrons(size)
         #self.num_e.SetValue(size)
         
         event.Skip()
@@ -855,7 +814,7 @@ class ControlPanel(wx.Panel):
         event.Skip()
         
         
-    def refreshFromHuckel(self,event):
+    def refreshFromHuckel(self):
 
         size = self.solver.getSize()
         self.basis_size.SetValue(size)

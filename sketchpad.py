@@ -1,3 +1,4 @@
+import time
 from guiparts import PlotPanel
 from molecule import Molecule,Atom,Bond
 import matplotlib
@@ -121,7 +122,7 @@ class MoleculePlotPanel(PlotPanel):
         self.mouseDown = False
         self._redrawFlag = False
         self.moved = False
-        self._doRefreshFromHuckel = True
+        self._doRefreshFromHuckel = False
         #self.SetColor( (255,255,255) )
         self.solver_update_needed = False
         
@@ -144,6 +145,7 @@ class MoleculePlotPanel(PlotPanel):
                 self.molecule.removeBond(a,b)
 
         self.relable_atoms()
+
         #self.solver_update_needed = True
         self._redrawFlag  = True
     #------------------------------------------------------------------------------------------------          
@@ -185,7 +187,7 @@ class MoleculePlotPanel(PlotPanel):
         artist = self.subplot.plot([x],[y],'o',color=color,picker=self.PICK_TOLERANCE,markersize=10,zorder=20)[-1]
         self.molecule.addAtom(artist,x,y,hx,sym)
         self.atom_bond_stack2.append(self.molecule.atom_stack[-1])
-        self.solver_update_needed = True
+
     #------------------------------------------------------------------------------------------------                      
     def connectionMade(self):
         
@@ -226,10 +228,11 @@ class MoleculePlotPanel(PlotPanel):
             self.molecule.addBond(artist,connection[0],connection[1],bond_types[bond_type][settings.k_delim])
             self.atom_bond_stack2.append(self.molecule.bond_stack[-1])
             self._redrawFlag = True
-            self.solver_update_needed = True
+
         
     #------------------------------------------------------------------------------------------------      
     def mouseUp(self,event):
+
         self._doRefreshFromHuckel = False
         if event.button == self.DRAW_BUTTON:
             
@@ -244,15 +247,24 @@ class MoleculePlotPanel(PlotPanel):
             #check if a new atom or bond is needed after click
             if event.inaxes:
                 self._redrawFlag = True
+
                 if self.newAtomRequired(self.mouseUpX,self.mouseUpY) and not self.moved:
+
+
                     hx = Atom.ATOM_TYPES[self.current_atom_type]["h"]
                     self.addNewAtom(self.mouseUpX,self.mouseUpY,hx,self.current_atom_type)
+
+                    #self.solver_update_needed = True
+                    
+                    self.solver.setData(self.molecule.huckelMatrix())
                 else:
                     new_connection = self.connectionMade()
                     if new_connection:
                         self.addNewBond(new_connection)
+                        self.solver.setData(self.molecule.huckelMatrix())
+                        #self.solver_update_needed = True
 
-        
+
             #now change the focus to huckel matrix if user picked an atom or a bond
             if self.set_focus_to_huck :
                 huck = self.GetParent().huckel_matrix
@@ -298,7 +310,8 @@ class MoleculePlotPanel(PlotPanel):
             b = self.molecule.atom_stack.index(bond.b)
             self.molecule.removeBond(a,b)
             
-        self.solver_update_needed = True
+        self.solver.setData(self.molecule.huckelMatrix())            
+#        self.solver_update_needed = True
         self._redrawFlag = True
         
     
@@ -312,11 +325,8 @@ class MoleculePlotPanel(PlotPanel):
             atom_type = AtomTypeDialog(atom,a)
             result = atom_type.ShowModal()
             if result == wx.ID_OK:
-                atom.hx = -1.*abs(float(atom_type.hx.GetValue()))
-                atom.sym = atom_type.atom_type.GetValue()
+                atom.setData(atom.x,atom.y,-1.*abs(float(atom_type.hx.GetValue())),atom_type.atom_type.GetValue())
                 bonds = [bond for bond in self.molecule.bond_stack if bond.a == atom or bond.b == atom]
-                atom.artist.set_color(settings.COLOUR_LIST[sorted(Atom.ATOM_TYPES.keys()).index(atom.sym)].lower())
-                #import matplotlib
                 
                 for bond in bonds:
                     update = True
@@ -338,7 +348,8 @@ class MoleculePlotPanel(PlotPanel):
                         else:
                             bond.k_xy = Bond.BOND_TYPES[b2][settings.k_delim]
                 self._redrawFlag = True      
-                self.solver_update_needed = True
+                self.solver.setData(self.molecule.huckelMatrix())
+#                self.solver_update_needed = True
                 
             atom_type.Destroy()
             self.back_from_dialog = True
@@ -358,7 +369,8 @@ class MoleculePlotPanel(PlotPanel):
                 bond.k_xy = -1.*abs(float(bond_type.k_xy.GetValue()))
                 if abs(bond.k_xy) < settings.eps:
                     self.deleteAtomOrBond(bond.artist)
-                self.solver_update_needed = True
+                #self.solver_update_needed = True
+                self.solver.setData(self.molecule.huckelMatrix())
                 #self._redrawFlag = True
                 
             bond_type.Destroy()
@@ -479,10 +491,10 @@ class MoleculePlotPanel(PlotPanel):
         if self.solver_update_needed:
             
             
-            self.solver.setData(self.molecule.huckelMatrix())
+#            self.solver.setData(self.molecule.huckelMatrix())
             
             
-            self.solver.setNumElectrons(self.molecule.numAtoms)
+            #self.solver.setNumElectrons(self.molecule.numAtoms)
             
             
             #self.GetParent().setLevelPointer(0)
@@ -499,8 +511,8 @@ class MoleculePlotPanel(PlotPanel):
     def _getRandPos(self,n):
         return [(math.cos(x*2*math.pi/n),math.sin(x*2*math.pi/n)) for x in range(0,n)]
 
-    def createFromHuckel(self,data):
-        
+    def createFromHuckel(self,data,minimize=True):
+
         if 0 not in data.shape and data.shape[1] == data.shape[0]:
             size = data.shape[0]
             init_pos = self._getRandPos(size)
@@ -509,32 +521,34 @@ class MoleculePlotPanel(PlotPanel):
                 for jj in range(ii):
                     if abs(data[ii,jj])>settings.eps:
                         self.addNewBond((ii,jj),data[ii,jj])
-            self.molecule.minimizePositions()
+            if minimize:
+                self.molecule.minimizePositions()
                         
         
     #------------------------------------------------------------------------------------------------          
-    def refreshFromHuckel(self,event):
-        if self._doRefreshFromHuckel:
-            if self.solver.getSize()>0 and self.GetParent().visual_mode.IsChecked():
-                huck = self.solver.data
-                cur_huck = self.molecule.huckelMatrix()
+    def refreshFromHuckel(self):
+#        if self._doRefreshFromHuckel:
+
+        if self.solver.getSize()>0 and self.GetParent().visual_mode.IsChecked():
+            huck = self.solver.data
+            cur_huck = self.molecule.huckelMatrix()
+
+            for ii in range(self.molecule.numAtoms):
+                self.molecule.atom_stack[ii].hx = huck[ii,ii]
+                for jj in range(ii):
+                    if abs(cur_huck[ii,jj])<settings.eps and abs(huck[ii,jj])>settings.eps:
+                        #new bond was created in the huckel matrix input
+                        self.addNewBond((ii,jj))
+                        
+                    elif abs(cur_huck[ii,jj])>settings.eps and abs(huck[ii,jj])<settings.eps:
+                        #bond was deleted from huckel matrix input
+                        self.deleteAtomOrBond(self.molecule.getBond(ii,jj).artist)
     
-                for ii in range(self.molecule.numAtoms):
-                    self.molecule.atom_stack[ii].hx = huck[ii,ii]
-                    for jj in range(ii):
-                        if abs(cur_huck[ii,jj])<settings.eps and abs(huck[ii,jj])>settings.eps:
-                            #new bond was created in the huckel matrix input
-                            self.addNewBond((ii,jj))
-                            
-                        elif abs(cur_huck[ii,jj])>settings.eps and abs(huck[ii,jj])<settings.eps:
-                            #bond was deleted from huckel matrix input
-                            self.deleteAtomOrBond(self.molecule.getBond(ii,jj).artist)
-        
-                        if abs(huck[ii,jj])>settings.eps:
-                            self.molecule.getBond(ii,jj).k_xy = huck[ii,jj]
-                #self.molecule.updateFromHuckel(huck)
-                self._redrawFlag = True
-        self._doRefreshFromHuckel = True
+                    if abs(huck[ii,jj])>settings.eps:
+                        self.molecule.getBond(ii,jj).k_xy = huck[ii,jj]
+            #self.molecule.updateFromHuckel(huck)
+            self._redrawFlag = True
+ #   self._doRefreshFromHuckel = True
     
     #------------------------------------------------------------------------------------------------              
     def initializePlot(self):

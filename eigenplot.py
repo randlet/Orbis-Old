@@ -48,8 +48,10 @@ class EigenPlotPanel(PlotPanel):
             
         
     #------------------------------------------------------------------------------------------------          
-    def refreshFromHuckel(self,event):
-        self._redrawFlag = True
+    def refreshFromHuckel(self):
+        self._redrawFlag = False
+        if self.GetParent().visual_mode.IsChecked():        
+            self.draw()
         
     #------------------------------------------------------------------------------------------------              
     def initializePlot(self):
@@ -57,11 +59,15 @@ class EigenPlotPanel(PlotPanel):
         self.subplot = self.figure.add_subplot( 111 )
         self.figure.suptitle('Orbitals')
         self.setPlotProperties()
-
+        self.drawLegend()                    
+        self.setPlotProperties()
+        
     def setPlotProperties(self):
         #self.subplot.axis('auto')
         #self.subplot.set_aspect('auto',adjustable="datalim")
         self.subplot.set_xticklabels([""])
+        self.subplot.set_xticks([])
+        self.subplot.set_yticks([])
         self.subplot.set_yticklabels([""])
         
     
@@ -70,7 +76,7 @@ class EigenPlotPanel(PlotPanel):
             fmt = 'or'
         else:
             fmt = 'ob'
-        self.subplot.plot([x],[y],fmt,markersize=max(2,abs(size)))
+        self.subplot.plot([x],[y],fmt,markersize=abs(size))#max(2,abs(size)))
     #------------------------------------------------------------------------------------------------                      
     def addNewBond(self,xcoords,ycoords):
         
@@ -86,28 +92,36 @@ class EigenPlotPanel(PlotPanel):
         if not hasattr( self, 'subplot' ):
             self.initializePlot()            
         else:
-            self.subplot.clear()
-            
+            while self.subplot.lines:
+                self.subplot.lines.pop()
+            while self.subplot.texts:
+                self.subplot.texts.pop()
+
         if len(self.molecule.atom_stack)>0 and self.GetParent().visual_mode.IsChecked():
             
             eigen_vecs = self.solver.eigen_vecs
             pointer = self.GetParent().level_pointer
-
+            if pointer > len(eigen_vecs):
+                pointer = len(eigen_vecs)-1
 
             magnitudes = [int(50*x) for x in eigen_vecs[pointer]]
 
             for bond in self.molecule.bond_stack:
+
                 self.addNewBond(bond.XCoords(),bond.YCoords())
 
+            self.xs = []
+            self.ys = []
+                
             for ii,atom in enumerate(self.molecule.atom_stack):
-                self.addNewAtom(atom.x,atom.y,magnitudes[ii])
-            self.drawLegend()            
-            self.relable_atoms()
+                x,y = atom.x,atom.y
+                self.xs.append(x),self.ys.append(y)
+                self.addNewAtom(x,y,magnitudes[ii])
             self.resize()
+            
+            self.relable_atoms()
 
 
-        self.setPlotProperties()
-        
         self.canvas.draw()
         
     def drawLegend(self):
@@ -124,10 +138,8 @@ class EigenPlotPanel(PlotPanel):
         
         #zoom out so atom occupies roughly 1/3 panel
         scale = 0.4
-        xs = [atom.x for atom in self.molecule.atom_stack]
-        ys = [atom.y for atom in self.molecule.atom_stack]
-        min_x,max_x = min(xs),max(xs)
-        min_y,max_y = min(ys),max(ys)
+        min_x,max_x = min(self.xs),max(self.xs)
+        min_y,max_y = min(self.ys),max(self.ys)
         
         dx = abs(max_x-min_x)*scale
         dy = abs(max_y-min_y)*scale
@@ -137,15 +149,12 @@ class EigenPlotPanel(PlotPanel):
             
 
     def relable_atoms(self):
-        
-        xs = [atom.x for atom in self.molecule.atom_stack]
-        ys = [atom.y for atom in self.molecule.atom_stack]
-        
+
         self.subplot.texts = []
         
         delta = 0.1
-        for ii in range(len(xs)):
-            x,y = xs[ii],ys[ii]
+        for ii in range(len(self.xs)):
+            x,y = self.xs[ii],self.ys[ii]
             if x < 0 and y<0:
                 ha,va='right','top'
                 dx,dy = -delta,-delta

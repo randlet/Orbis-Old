@@ -1,10 +1,11 @@
 import numpy
 import settings
+import time
 
 class AbstractModel(object): 
     def __init__(self): 
         self.listeners = [] 
-        self.update_required = True
+#        self.update_required = True
         
     def addListener(self, listenerFunc): 
         if listenerFunc not in self.listeners:
@@ -14,13 +15,12 @@ class AbstractModel(object):
         if listenerFunc in self.listeners:
             self.listeners.remove(listenerFunc) 
         
-    def update(self,event): 
+    def update(self): 
         
-        if self.update_required:
-            for eachFunc in self.listeners: 
-                eachFunc(self)
-            
-            self.update_required = False
+        for eachFunc in self.listeners: 
+
+            eachFunc()
+
 
 class HuckelSolver(AbstractModel):
     MIN_SHAPE = (0,0)
@@ -29,8 +29,10 @@ class HuckelSolver(AbstractModel):
         
         AbstractModel.__init__(self)
         assert type(data==numpy.matrix)
-        
-        self.setData(data)
+        self.data = data
+
+        self.reset()
+#        self.setData(data)
 #------------------------------------------------------------------------------------------------        
     def getEigenValsVecs(self):
         """Get the list of 
@@ -63,7 +65,7 @@ class HuckelSolver(AbstractModel):
         return pi_energy
 
 #------------------------------------------------------------------------------------------------    
-    def reset(self):
+    def reset(self,update=True):
         shape =  self.MIN_SHAPE #self.data.shape
         size = shape[0]
        
@@ -75,33 +77,53 @@ class HuckelSolver(AbstractModel):
         self.aa_polar = []
         self.ab_polar = []
         self.unique_levels = []
+        self.populated_levels = []
         self.bond_orders =  numpy.mat(numpy.zeros(shape),float)
         self.spin_densities = numpy.array([0]*size,float)
         self.net_charges = numpy.array([0]*size,float)
-        
-        self.update_required = True
+
+        if update:
+            self.update()
+#        self.update_required = True
 
 
-    def setData(self,data):
+    def setData(self,data,num_e=-1):
         """Set all elements of the huckel matrix and then calculate everything and trigger updater
         Inputs: data -> nxn numpy array/matrix
                 note data should all be less than zero!
         Outputs: None"""
         
         assert (type(data) in (numpy.matrix,numpy.array,numpy.ndarray))
-        #assert (data.shape[0] == data.shape[1] or data.shape == (1,0))
-        self.reset()
+       
+        
+
         if type(data)!= numpy.matrix:
             data = numpy.mat(data)
+            
+        if num_e <0:
+            num_e = data.shape[0]
+
+#        if self.data.shape != data.shape:
+ #           num_e = data.shape[0]
+ #       else:
+ #           num_e = self.num_e
+
+        self.reset(False)        
+        self.bond_pairs = []
         for ii in range(data.shape[0]):
             for jj in range(ii):
                 data[ii,jj] = -1.*abs(data[ii,jj])
                 data[jj,ii] = data[ii,jj]
+                if ii != jj and abs(data[ii,jj])>settings.eps:
+                    self.bond_pairs.append((ii,jj))
         
         self.data = data
 
-        self._doCalcs()
-        
+
+        self._solveHuckel()
+
+        self.setNumElectrons(num_e)
+
         
     
 #------------------------------------------------------------------------------------------------    
@@ -111,21 +133,28 @@ class HuckelSolver(AbstractModel):
         Inputs: num -> int, Number of electrons. Automatically set to be > 0
         Outputs: None"""
         
-        
+
         self.num_e = max(settings.MIN_NUM_E,int(num))
+        func_list = (self._populateLevels,self._calcBondOrders,self._calcNetCharges,self._calcAAPolarizability,self._calcABPolarizability)
+        func_list = (self._populateLevels,)#,self._calcBondOrders,self._calcNetCharges,self._calcAAPolarizability,self._calcABPolarizability)
 
-        self._populateLevels()
-        
-        self._calcBondOrders()
+        for func in func_list:
 
-        self._calcNetCharges()
+            func()
+
+#        self._populateLevels()
+#        print "
+#        self._calcBondOrders()#
+
+#        self._calcNetCharges()
         
-        #self._calcAAPolarizability()
+ #       self._calcAAPolarizability()
         
-        #self._calcABPolarizability()
-        
-        self.update_required = True        
-        #self.update()
+  #      self._calcABPolarizability()
+   #     print "setnume update"
+#        self.update_required = True        
+
+        self.update()
         
     
 #------------------------------------------------------------------------------------------------    
@@ -138,12 +167,14 @@ class HuckelSolver(AbstractModel):
         if row != col:
             val = -1.*abs(val)
         self.data[max(0,row),max(0,col)] = val
-        self._doCalcs()
+        self._solveHuckel()
+        self.setNumElectrons(self.num_e)
         
     
 #------------------------------------------------------------------------------------------------
     def _calcAAPolarizability(self):
         """Atom-Atom polarizabilities fom Computing methods in quantum organic chemistry - Greenwood: pg 54"""
+
         
         N = self.getSize()
         self.aa_polar = numpy.mat(numpy.zeros((N,N),float))
@@ -158,18 +189,25 @@ class HuckelSolver(AbstractModel):
                 for jj in range(M):
                     c_rj = self.eigen_vecs[jj][rr]
                     c_uj = self.eigen_vecs[jj][uu]
+                    c_rj_c_uj = c_rj*c_uj
+#                    if abs(c_rj_c_uj)>settings.eps:
                     e_j = self.eigen_vals[jj]
                     tmp = 0
                     for kk in range(M,N):
                         c_rk = self.eigen_vecs[kk][rr]
                         c_uk = self.eigen_vecs[kk][uu]
                         e_k = self.eigen_vals[kk]
-                        
-                        tmp = tmp+c_rk*c_uk/(e_j-e_k)
-                    aap = aap+c_rj*c_uj*tmp
+                        c_rk_c_uk = c_rk*c_uk
+#                            if abs(c_rk_c_uk)>settings.eps:
+                        tmp += c_rk_c_uk/(e_j-e_k)
+                                
+                    aap += c_rj_c_uj*tmp
                 self.aa_polar[rr,uu] = aap
                 self.aa_polar[uu,rr] = aap
-        return 4*self.aa_polar
+        self.aa_polar = 4*self.aa_polar
+        return self.aa_polar
+    
+#        return 4*self.aa_polar
     
 #------------------------------------------------------------------------------------------------
     def _calcABPolarizability(self):
@@ -190,26 +228,41 @@ class HuckelSolver(AbstractModel):
         M = len(dbl_orbitals) #number of doubly occupied orbitals
 
         #loop over each atom and calculate
-        ab_polar = -1.*numpy.mat(numpy.zeros((N,N),float))
+#        ab_polar = -1.*numpy.mat(numpy.zeros((N,N),float))
         ab_polar = []
+        c_ujs = []
 
-        for ss in range(N):
-            for tt in range(ss):
-                if abs(self.data[ss,tt])>settings.eps:
+        m_range = range(M)
+        n_range = range(N)
+        m_n_range = range(M,N)
+
+        for jj in m_range:
+            c_ujs.append(self.eigen_vecs[jj][uu])
+        
+#        for ss in n_range:
+#            for tt in range(ss):
+            
+        for ss,tt in self.bond_pairs:
+                
+#                if abs(self.data[ss,tt])>settings.eps:
                     abp = 0.
-                    for jj in range(M):
-                        c_sj,c_tj,c_uj = [self.eigen_vecs[jj][idx] for idx in [ss,tt,uu]]
+                    for jj in m_range:
+                        c_uj = c_ujs[jj]
+                        c_sj,c_tj = self.eigen_vecs[jj][ss],self.eigen_vecs[jj][tt]
+                        
                         e_j = self.eigen_vals[jj]
                         tmp = 0
-                        for kk in range(M,N):
-                            c_sk,c_tk,c_uk = [self.eigen_vecs[kk][idx] for idx in [ss,tt,uu]]
-                            e_k = self.eigen_vals[kk]
-                            tmp = tmp+c_uk*(c_sj*c_tk+c_tj*c_sk)/(e_j-e_k)
-                            
-                        abp =abp+c_uj*tmp
+                        if abs(c_uj)>settings.eps and (abs(c_sj)>settings.eps or abs(c_tj)>settings.eps):
+                            for kk in m_n_range:
+                                c_sk,c_tk,c_uk = self.eigen_vecs[kk][ss],self.eigen_vecs[kk][tt],self.eigen_vecs[kk][uu]
+                                e_k = self.eigen_vals[kk]
+                                
+                                if abs(c_uk) > settings.eps:
+                                    tmp = tmp+c_uk*(c_sj*c_tk+c_tj*c_sk)/(e_j-e_k)
+                                    
+                            abp += c_uj*tmp
+
                     ab_polar.append((ss,tt,2*abp))
-                    #ab_polar[ss,tt] = abp
-                    #ab_polar[tt,ss] = abp
 
         return ab_polar
         
@@ -231,17 +284,15 @@ class HuckelSolver(AbstractModel):
     
                         #spin density for a given atom is calculated as occupation weighted average of all SOMO coefficients squared. 
                         if num_e < 2 and ii == jj:
-                            spin_density += num_e*vec[ii]*vec[ii]
+                            spin_density += num_e*vec[ii]**2
                             
-                    if abs(bo)<settings.eps:
-                        bo =  0.0
                     self.bond_orders[ii,jj] = bo
                     self.bond_orders[jj,ii] = bo
                     
-                    self.spin_densities[ii] = spin_density
+                self.spin_densities[ii] = spin_density
     
         
-
+        return self.bond_orders
 #------------------------------------------------------------------------------------------------    
     def _calcNetCharges(self):
         size = self.getSize()
@@ -250,7 +301,7 @@ class HuckelSolver(AbstractModel):
             for ii in range(size):
                 self.net_charges[ii] = 1. - self.bond_orders[ii,ii]
         
-        
+        return self.net_charges
 #------------------------------------------------------------------------------------------------
     def _doCalcs(self):
         
@@ -262,11 +313,12 @@ class HuckelSolver(AbstractModel):
         
         self._calcNetCharges()
         
-        #self._calcAAPolarizability()
+        self._calcAAPolarizability()
         
-        #self._calcABPolarizability()
-        
-        self.update_required = True
+        self._calcABPolarizability()
+
+        self.update()
+#        self.update_required = True
 
   
 #------------------------------------------------------------------------------------------------        
@@ -312,7 +364,7 @@ class HuckelSolver(AbstractModel):
                 lvl_idx+=1                                                
 
         self.populated_levels = populated_levels
-        
+        return self.populated_levels
 
     def bondsExist(self):
         if 0 in self.data.shape:
@@ -328,6 +380,8 @@ class HuckelSolver(AbstractModel):
     def _solveHuckel(self):
         """Calculate the eigenvalues and vectors of the secular matrix"""
         if self.getSize()>0:#self.bondsExist():
+#        if self.data.any():
+            
             # get eigenvalues/vectors from lower triangular portion of secular matrix
             
             vals,vecs = numpy.linalg.eigh(self.data,'L')
