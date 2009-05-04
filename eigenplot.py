@@ -126,7 +126,7 @@ class EigenPlotPanel(PlotPanel):
         
     def drawLegend(self):
 
-        fmts = (('.w','Sign of eigenvector coefficient:'),('ro','Ci > 0'),('bo','Ci < 0'),)                    
+        fmts = (('.w',' '),('ro','Ci > 0'),('bo','Ci < 0'),)                    
         [self.subplot.plot([-999],[0],fmt[0],label=fmt[1],markersize=5) for fmt in fmts]
             
         font = matplotlib.font_manager.FontProperties(size=11)

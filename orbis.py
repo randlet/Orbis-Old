@@ -12,8 +12,8 @@ import csv
 import wx
 import wx.grid
 import numpy
-
-
+from editatombond import EditAtomTypes
+from help import About
 import os
 import sys
 
@@ -195,13 +195,17 @@ class MainFrame(wx.Frame):
                 ('&Save Session\tCtrl+S','Save the current Session',self.OnSave),
                 ('Save Session &As...\tCtrl+Shift+S','Save the current session as...',self.OnSaveAs),
                 (),
-                ('&Import Data...','Import Huckel matrix data from a text file',self.OnImport),
+                ('Import &Geometry Data...\tCtrl+G','Import molecule geometry data from a file',self.OnImportGeom),
+                ('Import &Huckel Matrix...\tCtrl+H','Import Huckel matrix data from a text file',self.OnImportHuck),
                 ('&Export Results...','Export results of Huckel Calculation',self.OnExport),
                 (),
                 ('&Quit\tCtrl+Q' ,'Terminate Scimple Huckel Solver',self.OnQuit))
 
     def editMenuData(self):
         return (('&Copy\tCtrl+C','Copy selected data to the clipboard',self.OnCopy),)    
+
+    def helpMenuData(self):
+        return (('&About...','Information about Orbis',self.onAbout),)    
     
     def viewMenuData(self):
         return (('&Visual Mode\tCtrl+I',"Switch between visual (molecule) mode and general matrix mode",self.onVisualMode,wx.ITEM_CHECK),
@@ -232,13 +236,16 @@ class MainFrame(wx.Frame):
         menu_edit = self.createMenu(self.editMenuData())
         
         menu_view = self.createMenu(self.viewMenuData())
+
+        
         self.visual_mode = menu_view.GetMenuItems()[0]
         self.visual_mode.Check(True)
         self.redraw = menu_view.GetMenuItems()[1]
 
         menu_tools = self.createMenu(self.toolMenuData())
+        menu_help = self.createMenu(self.helpMenuData())        
         
-        menus = ((menu_file,"&File"),(menu_edit,"&Edit"),(menu_view,"&View"),(menu_tools,'&Tools'))
+        menus = ((menu_file,"&File"),(menu_edit,"&Edit"),(menu_view,"&View"),(menu_tools,'&Tools'),(menu_help,'&Help'))
 
         menu_bar = wx.MenuBar()
         for menu,menu_str in menus:
@@ -246,6 +253,8 @@ class MainFrame(wx.Frame):
 
         self.SetMenuBar(menu_bar)
     
+    def onAbout(self,event):
+        About(self).ShowModal()
         
     def OnEditAtomType(self,event):
         atom_dlg = EditAtomTypes()
@@ -270,41 +279,126 @@ class MainFrame(wx.Frame):
             Bond.WriteBondLib(bond_dlg.bond_types)
         bond_dlg.Destroy()
 
-        
-    def OnImport(self,event):
-        wildcard = "Comma Separated Value (*.csv)|*.csv|"\
-                 "All (*.*)|*.*"
-        
-        file_dlg = wx.FileDialog(self,"Import Data",wildcard=wildcard,style=wx.OPEN)
-        if file_dlg.ShowModal() == wx.ID_OK:
+    def importHuck(self,fpath):
+        try:
+
+            csv_file = open(fpath,'r')
+            row = csv_file.readline()
+            dialect = csv.Sniffer().sniff(row)
+            csv_file.seek(0)
+            reader = csv.reader(csv_file,dialect)
             
+        except:
             try:
-                
-                csv_file = open(file_dlg.GetPath(),'r')
-                row = csv_file.readline()
-                dialect = csv.Sniffer().sniff(row)
+                dialect.delimter = ' '
                 csv_file.seek(0)
                 reader = csv.reader(csv_file,dialect)
                 
-                
-                data = [map(float,row) for row in reader if len(row)>0]
-                data = numpy.mat(data)
-                
-                if wx.MessageBox("Do you want to try to autodraw a molecule from this data?","Import as Molecule?",style=wx.ICON_QUESTION|wx.YES_NO) == wx.YES:
-                    self.setVisualMode()
-
-                    self.sketch_pad.reset()
-                    self.huckel_solver.reset()
-                    
-                    self.sketch_pad.createFromHuckel(data)
-                    
-                else:
-                    self.setVisualMode(False)
-                    self.huckel_solver.setData(data)
-                
             except:
-                wx.MessageBox("Unable to import data from %s" %(file_dlg.GetFilename()),"Import Error",style=wx.OK|wx.ICON_ERROR)
+                return 0
 
+        try:
+            data = [map(float,row) for row in reader if len(row)>0]
+            data = numpy.mat(data)
+            
+            if wx.MessageBox("Do you want to try to autodraw a molecule from this data?","Import as Molecule?",style=wx.ICON_QUESTION|wx.YES_NO) == wx.YES:
+                self.setVisualMode()
+    
+                self.sketch_pad.reset()
+                self.huckel_solver.reset()
+                
+                self.sketch_pad.createFromHuckel(data)
+
+                self.huckel_solver.setData(data,data.shape[0])                                    
+                
+                self.sketch_pad.draw()
+                self.eld.draw()
+                self.results_display_2dmo.draw()
+        
+                self.sketch_pad.resize()                
+            else:
+                self.setVisualMode(False)
+                self.huckel_solver.setData(data)
+
+
+                
+        except:
+            return 0
+
+        return 1            
+    
+    def importGeom(self,fname,parserType):
+        try:
+            self.visual_mode.Check(True)
+            self.setVisualMode()                                        
+    
+            parser = parserType(fname)
+            parser.parse()
+            parser.close()
+    
+            data = numpy.mat(numpy.zeros((len(parser.atoms),len(parser.atoms)),float))
+            
+            for ii, atom in enumerate(parser.atoms):
+                sym,x,y,z = atom
+                self.sketch_pad.addNewAtom(x,y,sym=sym)
+                atom = self.sketch_pad.molecule.atom_stack[-1]
+                data[ii,ii] = atom.hx
+    
+            for a,b,t in parser.bonds:
+                self.sketch_pad.addNewBond((a,b))
+                k_xy = self.sketch_pad.molecule.bond_stack[-1].k_xy
+                data[a,b] = k_xy
+                data[b,a] = k_xy
+    
+            self.huckel_solver.setData(data,data.shape[0])                                    
+            
+            self.sketch_pad.draw()
+            self.eld.draw()
+            self.results_display_2dmo.draw()
+    
+            self.sketch_pad.resize()
+            
+            return 1
+        except:
+            return 0
+
+
+
+
+    def OnImportGeom(self,event):
+        import geomparsers
+        file_type_handlers = {0:geomparsers.ParseCSV, 1:geomparsers.ParseMOL, 2:geomparsers.ParseXYZ, 3:geomparsers.ParseCSV}
+        wildcard = "Comma Separated Value (*.csv)|*.csv|"\
+                 "Molfile (*.mol)|*.mol|"\
+                 "XYZ file (*.xyz)|*.xyz|"\
+                 "All (*.*)|*.*"
+        
+        file_dlg = wx.FileDialog(self,"Import Molecule Geometry Data",wildcard=wildcard,style=wx.OPEN)
+
+        if file_dlg.ShowModal() == wx.ID_OK:
+            
+            result = self.importGeom(file_dlg.GetPath(),file_type_handlers[file_dlg.GetFilterIndex()])
+            if result == 0:
+                err = "Unable to import data from %s: Please check the formatting of the file." %(file_dlg.GetFilename())                
+                err += "\nIf you believe this is a bug in Orbis please send an email describing the problem to mail@simplehuckel.com"
+                wx.MessageBox(err,"Import Error",style=wx.OK|wx.ICON_ERROR)                
+                    
+
+    def OnImportHuck(self,event):
+        wildcard = "Comma Separated Value (*.csv)|*.csv|"\
+                 "All (*.*)|*.*"
+        
+        file_dlg = wx.FileDialog(self,"Import Huckel Matrix Data",wildcard=wildcard,style=wx.OPEN)
+
+        if file_dlg.ShowModal() == wx.ID_OK:
+            
+            result = self.importHuck(file_dlg.GetPath())
+            if result == 0:
+                err = "Unable to import data from %s: Please check the formatting of the file." %(file_dlg.GetFilename())
+                err += "\nIf you believe this is a bug in Orbis please send an email describing the problem to mail@simplehuckel.com"
+                wx.MessageBox(err,"Import Error",style=wx.OK|wx.ICON_ERROR)                
+                    
+    
                 
     def exportData(self,fname):
         outfile = open(fname,'w')
@@ -471,6 +565,8 @@ class MainFrame(wx.Frame):
             self.controls.basis_size.Enable(False)
             self.controls.atom_type.Enable(True)
             if self.results_display.GetPageCount()<4:
+                self.results_display.AddPage(self.results_display_pibond,u"\u03A0 - Bond Orders")
+                self.results_display.AddPage(self.results_display_charge,"Charge Densities")
                 self.results_display.AddPage(self.results_display_pol,"A-A Polarizabilities")
                 self.results_display.AddPage(self.results_display_atom_bond_pol,"A-B Polarizabilities")
         else:
@@ -485,11 +581,14 @@ class MainFrame(wx.Frame):
             self.controls.minimize.Enable(False)
             self.main_sizer.Hide(self.sketch_pad,recursive=True)
             self.results_sizer.Hide(self.results_display_2dmo,recursive=True)
+            
             self.controls.basis_size.Enable(True)
             self.controls.atom_type.Enable(False)
-
+            
             self.results_display.RemovePage(4)            
             self.results_display.RemovePage(3)
+            self.results_display.RemovePage(2)
+            self.results_display.RemovePage(1)
 #            self.results_display_atom_bond_pol.Hide()
             self.results_display_pol.Hide()
 
@@ -611,7 +710,7 @@ class MainFrame(wx.Frame):
         self.results_display_pibond.SetSizer(pib_sizer)
         self.pibond_matrix.SetSize(self.results_display.GetPage(0).GetSize())
 
-        self.results_display.AddPage(self.results_display_charge,"Net Charges")
+        self.results_display.AddPage(self.results_display_charge,"Charge Densities")
         nc_sizer = wx.BoxSizer(wx.HORIZONTAL)
         nc_sizer.Add(self.net_charge,1,wx.EXPAND)
         self.results_display_charge.SetSizer(nc_sizer)
@@ -651,7 +750,7 @@ class MainFrame(wx.Frame):
 
 if __name__ == "__main__":
 
-    try:
+#    try:
         
 
 
@@ -666,6 +765,12 @@ if __name__ == "__main__":
 
         import psyco
         psyco.full()
+        
+        a = Atom(0,0) #preload atom types
+        b = Atom(1,1)
+        
+        bond = Bond(a,b)
+
         app = wx.PySimpleApp(0)
         wx.InitAllImageHandlers()
         main_frame = MainFrame(None, -1, "Orbis - Simple Huckel Solver")
@@ -675,7 +780,7 @@ if __name__ == "__main__":
         main_frame.Show()
         app.MainLoop()
         
-    except:
-        print sys.exc_info()
-    finally:
-        settings.logfile.close()
+    #except:
+        #print sys.exc_info()
+    #finally:
+        #settings.logfile.close()

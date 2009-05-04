@@ -9,7 +9,7 @@ import time
 import wx
 import sys
 from validators import NumberValidator
-from editatombond import EditBondTypes
+from editatombond import EditBondTypes,EditAtomTypes
 #===================================================================================================
 class AtomTypeDialog(wx.Dialog):
     
@@ -106,6 +106,9 @@ class MoleculePlotPanel(PlotPanel):
         self.tooltip.SetDelay(500)
         
         self.solver = parent.huckel_solver
+
+        self.ignored_atom_types = []
+        self.ignored_bond_types = []
         
         self.molecule = Molecule()
         self._bonding = []
@@ -181,10 +184,28 @@ class MoleculePlotPanel(PlotPanel):
     def addNewAtom(self,x,y,hx=0.0,sym=""):
         if sym == "":
             sym = self.current_atom_type
-        
+        #make sure all atom types are present
+        if sym not in Atom.ATOM_TYPES.keys():
+
+            if sym not in self.ignored_atom_types and wx.MessageBox("This atom type (%s) doesn't currently exist in the Orbis data set. Create a new atom type? (Select No to use default (C) or Yes to create new atom type)" %(sym),"Create new atom type",style=wx.YES_NO) == wx.YES:
+                dlg = EditAtomTypes()
+                create_new = dlg.OnNew(None)
+                print create_new,wx.ID_OK
+                if create_new == wx.ID_OK:
+                    sym = dlg.atom_type.GetValue()
+                    Atom.WriteAtomLib(dlg.atom_types)
+                else:
+                    self.ignored_atom_types.append(sym)
+                    sym = "C"
+                dlg.Destroy()
+            else:
+                self.ignored_atom_types.append(sym)
+                sym = "C"
+        hx = Atom.ATOM_TYPES[sym]['h']
         color = settings.COLOUR_LIST[sorted(Atom.ATOM_TYPES.keys()).index(sym)].lower()
-            
+
         artist = self.subplot.plot([x],[y],'o',color=color,picker=self.PICK_TOLERANCE,markersize=10,zorder=20)[-1]
+
         self.molecule.addAtom(artist,x,y,hx,sym)
         self.atom_bond_stack2.append(self.molecule.atom_stack[-1])
 
@@ -207,21 +228,27 @@ class MoleculePlotPanel(PlotPanel):
             xf,yf = b.x,b.y
                         
             bond_types = Bond.BOND_TYPES
-            
-            if "%s-%s" % (a.sym,b.sym) in bond_types.keys():
-                bond_type = "%s-%s" % (a.sym,b.sym)
-            elif "%s-%s" % (b.sym,a.sym) in bond_types:
-                bond_type = "%s-%s" % (b.sym,a.sym)
+            b1 = "%s-%s" % (a.sym,b.sym)
+            b2 = "%s-%s" % (b.sym,a.sym)
+            print self.ignored_bond_types,b1,b2
+            if b1 in bond_types.keys():
+                bond_type = b1
+            elif b2 in bond_types:
+                bond_type = b2
             else:
-                if wx.MessageBox("This bond type (%s,%s) doesn't currently exist. Create a new bond type? (Select No to use default or Yes to create new bond type)" %(a.sym,b.sym),"Create new bond type",style=wx.YES_NO) == wx.YES:
+                if b1 not in self.ignored_bond_types and b2 not in self.ignored_bond_types and  wx.MessageBox("This bond type (%s,%s) doesn't currently exist. Create a new bond type? (Select No to use default or Yes to create new bond type)" %(a.sym,b.sym),"Create new bond type",style=wx.YES_NO) == wx.YES:
                     dlg = EditBondTypes()
                     create_new = dlg.sketchNew(a.sym,b.sym)
                     if create_new == wx.ID_OK:
                         bond_type = dlg.bond_type
                         Bond.WriteBondLib(dlg.bond_types)
+                    else:
+                        self.ignored_bond_types.extend([b1,b2])
+                        bond_type = "C-C"
                     dlg.Destroy()
                 else:
-                    bond_type = Bond.BondNames()[0]
+                    self.ignored_bond_types.extend([b1,b2])                    
+                    bond_type = "C-C"
                 
             artist = self.subplot.plot([xs,xf],[ys,yf],'r',picker=self.PICK_TOLERANCE,zorder=10)[-1]
             
@@ -515,7 +542,9 @@ class MoleculePlotPanel(PlotPanel):
 
         if 0 not in data.shape and data.shape[1] == data.shape[0]:
             size = data.shape[0]
+
             init_pos = self._getRandPos(size)
+                
             for ii in range(size):
                 self.addNewAtom(init_pos[ii][0],init_pos[ii][1],data[ii,ii],sym = 'A')
                 for jj in range(ii):

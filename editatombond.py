@@ -114,6 +114,7 @@ class EditAtomTypes(wx.Dialog):
                     result = None
                     wx.MessageBox(msg,'Create Atom Problem',style=wx.ICON_WARNING)
 
+        return result
     def OnDelete(self,event):
         atom_type = self.atomTypeFromSelection()
         result = wx.MessageBox("Are you sure you want to delete this atom type?",'Delete Atom Type',style=wx.ICON_WARNING|wx.YES_NO)

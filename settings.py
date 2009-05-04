@@ -3,21 +3,19 @@ import sys
 root = os.path.dirname(os.path.abspath(sys.argv[0]))
 logfilen = logfile = root+'/simple_huckel.log'
 logfile = open(logfilen,'w')
-sys.stdout = logfile
+#sys.stdout = logfile
 
 logfile.write(sys.argv[0])
 logfile.flush()
 
+
 website = "http://www.simplehuckel.com"
 timebomb = (2009,6,1)
-
-from molecule import Atom,Bond
-import yaml
-version = 0.1
+version = "0.2.0"
 tool_tip_time = 4
 
 #equivalnce threshold i.e. abs(a-b)<eps implies a=b
-eps = 1.E-12
+eps = 1.E-10
 
 
 image_dir = root+'/images'
@@ -30,11 +28,9 @@ data_dir_name = root+'/data'
 atomic_data_file = data_dir_name+'/atomic_data.yaml'
 default_atomic_data_file = data_dir_name+'/default/atomic_data.yaml'
 
-a = Atom(0,0) #preload atom types
-b = Atom(1,1)
 bond_data_file = data_dir_name+'/bond_data.yaml'
 default_bond_data_file = data_dir_name+'/default/bond_data.yaml'
-bond = Bond(a,b)
+
 #atomic_data_file = 
 h_delim = 'h'
 k_delim = 'k'

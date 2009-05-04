@@ -39,6 +39,15 @@ class Bond():
         if b1 not in self.BOND_TYPES.keys() and b2 not in self.BOND_TYPES:
             Bond.BOND_TYPES[b1] = {settings.k_delim:k}
             
+    @classmethod
+    def GetBondType(self,a,b):
+        b1 = self.FMT % (a,b)
+        b2 = self.FMT % (b,a)
+
+        if b1 in self.BOND_TYPES.keys():
+            return Bond.BOND_TYPES[b1]  
+        elif b2 in self.BOND_TYPES.keys():
+            return Bond.BOND_TYPES[b2]  
         
     @classmethod
     def BondNames(self,types = {}):
