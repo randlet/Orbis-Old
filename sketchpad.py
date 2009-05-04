@@ -190,7 +190,7 @@ class MoleculePlotPanel(PlotPanel):
             if sym not in self.ignored_atom_types and wx.MessageBox("This atom type (%s) doesn't currently exist in the Orbis data set. Create a new atom type? (Select No to use default (C) or Yes to create new atom type)" %(sym),"Create new atom type",style=wx.YES_NO) == wx.YES:
                 dlg = EditAtomTypes()
                 create_new = dlg.OnNew(None)
-                print create_new,wx.ID_OK
+
                 if create_new == wx.ID_OK:
                     sym = dlg.atom_type.GetValue()
                     Atom.WriteAtomLib(dlg.atom_types)
@@ -230,7 +230,7 @@ class MoleculePlotPanel(PlotPanel):
             bond_types = Bond.BOND_TYPES
             b1 = "%s-%s" % (a.sym,b.sym)
             b2 = "%s-%s" % (b.sym,a.sym)
-            print self.ignored_bond_types,b1,b2
+
             if b1 in bond_types.keys():
                 bond_type = b1
             elif b2 in bond_types:

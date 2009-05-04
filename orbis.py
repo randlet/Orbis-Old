@@ -704,7 +704,7 @@ class MainFrame(wx.Frame):
         self.results_display_eig.SetSizer(eig_sizer)
         self.eigen_matrix.SetSize(self.results_display.GetPage(0).GetSize())
 
-        self.results_display.AddPage(self.results_display_pibond,u"\u03A0 - Bond Orders")
+        self.results_display.AddPage(self.results_display_pibond,"Pi Bond Orders")
         pib_sizer = wx.BoxSizer(wx.HORIZONTAL)
         pib_sizer.Add(self.pibond_matrix,1,wx.EXPAND)
         self.results_display_pibond.SetSizer(pib_sizer)

@@ -200,14 +200,420 @@ class ELDPlotPanel (PlotPanel):
 
                 energy= levels[0][0]
                 
-~
+                n = len(levels)
+                total_width = n*(self.width_space)-self.space
+
+                max_widths.append(total_width)
+
+                for ii in range(n):
+                    s = -total_width*0.5 + ii*(self.width_space)
+                    f = s+self.width
+                    ne = levels[ii][2]
+                    
+                    x = numpy.arange(s,f+self.step,self.step)
+                    y = [energy]*len(x)
+
+                    fmt = self.getFmt(ne)
+                    
+                    if level_idx == level_pointer:
+                        fmt += 'o'
+                        markersize = 8
+                    else:
+                        markersize = 1
+
+                    self.subplot.plot( [x[0],x[-1]], [y[0],y[-1]],fmt,picker=self.PICK_TOLERANCE,linewidth = 1,markersize=markersize)
+
+                    level_idx += 1
+            
+            max_width = max(max_widths)
+            self.subplot.axis([-0.6*max_width,0.6*max_width,min_energy,max_energy])
+
+        self.canvas.draw()
+
+    def getFmt(self,ne=-1):
+        fmts = (('.w','Filling:'),('k-','N=0'),('b--','0<N<1'),('b-','N=1'),('r--','1<N<2'),('r-','N=2'))                                        
+        if ne <0:
+            return fmts
+        elif ne <settings.eps:
+            return fmts[1][0]
+        elif 0<ne < 1:
+            return fmts[2][0]
+        elif abs(ne-1)<settings.eps:
+            return fmts[3][0]
+        elif 1 < ne <2:
+            return fmts[4][0]
+        else :
+            return fmts[5][0]
+
+ 
+
+        
+    
+    def drawLegend(self):
+
+
+        [self.subplot.plot([-999],[0],fmt[0],label=fmt[1],linewidth=3) for fmt in self.getFmt()]
+            
+        font = matplotlib.font_manager.FontProperties(size=10)
+        legend = self.subplot.legend(loc=8,ncol=3,prop=font,columnspacing=1,markerscale=4)
+        legend.draw_frame(False)
+        
+
+
+class HuckelMatrix(wx.grid.Grid):
+    #TODO: consolidate HuckelMatrix and Results Matrix
+
+    COL_WIDTH = 36
+    INIT_BASIS_SIZE = 0
+    COPY_DELIM = '\t'
+
+    def __init__(self, parent, ID=-1, label="", pos=wx.DefaultPosition, size=(100, 25)): 
+
+        wx.grid.Grid.__init__(self,parent,ID,pos,size,wx.RAISED_BORDER,label)
+
+        self.Bind(wx.grid.EVT_GRID_EDITOR_CREATED, self.OnGridEditorCreated)
+        self.Bind(wx.EVT_MENU_OPEN, self.OnMenuOpen)
+        self.Bind(wx.EVT_KEY_UP,self.onKeyPress)
+        self.solver = self.GetParent().huckel_solver
+        
+
+        self.tooltip = TimedToolTip(settings.tool_tip_time,tip='Click on a row to see corresponding orbital' )
+        #self.tooltip.Enable(False)
+        self.tooltip.SetDelay(500)
+        #self.show_tip = True
+        
+        self.SetToolTip(self.tooltip)
+        
+        num_rows = self.solver.getSize()
+        num_cols = num_rows
+        self.CreateGrid(num_cols,num_rows)
+
+        self.setLabels()
+
+        self.SetMargins(5,5)
+        self.SetDefaultColSize(self.COL_WIDTH)
+        self.SetRowLabelSize(self.COL_WIDTH)
+
+        init_data = self.solver.data
+        
+        self.setData(init_data)
+
+    def onKeyPress(self,event):
+
+        if event.ControlDown() and event.GetKeyCode() in [67,322]:
+            self.copy()
+
+        event.Skip()
+
+    def copy(self):
+        data = self.getData()
+        paster = wx.TextDataObject()
+
+        paste_data = ''
+        num = self.GetNumberCols()
+
+        for ii in range(num):
+            paste_data += self.COPY_DELIM.join([str(data[ii,jj]) for jj in range(num)]+['\n'])
+        paster.SetText(paste_data)
+
+        if wx.TheClipboard.Open():
+            wx.TheClipboard.SetData(paster)
+            wx.TheClipboard.Close()
+
+    def refreshFromHuckel(self):
+
+        self.setSize(self.solver.getSize())
+        
+        self.setData(self.solver.data)
+
+    def setData(self,data):
+        assert type(data) == numpy.matrix
+        for ii in range(data.shape[0]):
+            for jj in range(ii+1):
+                datum = data[ii,jj]
+                if abs(datum) < settings.eps:
+                    if ii == jj:
+                        datum = "0.0"
+                    else:
+                        datum = ""
+                self.SetCellValue(ii,jj,str(datum))
+                self.SetCellValue(jj,ii,str(datum))
+
+    def getData(self):
+        num = self.GetNumberCols()
+        data = numpy.mat(numpy.zeros((num,num),float))
+        for ii in range(num):
+            for jj in range(num):
+                val = self.GetCellValue(ii,jj)
+                if val =="":
+                    val = '0'
+                data[ii,jj] = float(val)
+        return data
+
+    def setSize(self,size):
+
+        cur_size = self.GetNumberCols()
+
+        diff = size - cur_size
+
+        if diff > 0:
+            self.AppendCols(diff,updateLabels=False)
+            self.AppendRows(diff,updateLabels=False)
+            for ii in range(cur_size,size):
+                for jj in range(ii+1):
+                    self.SetCellValue(ii,jj,"0.0")
+                    self.SetCellValue(jj,ii,"0.0")
+
+        if diff < 0 and size>-1:
+            diff = abs(diff)
+            self.DeleteCols(cur_size-diff,diff,updateLabels=False)
+            self.DeleteRows(cur_size-diff,diff,updateLabels=False)
+
+        self.setLabels()        
+
+    def setLabels(self,custom=[]):
+        size = self.GetNumberCols()
+        for ii in range(size):
+            if custom and len(custom)>=size:
+                label = custom[ii]
+            else:
+                label = str(ii+1)
+
+            self.SetColLabelValue(ii,label)
+
+
+    def OnGridEditorCreated(self, event):
+        """ Bind the kill focus event to the newly instantiated cell editor """
+        editor = event.GetControl()
+        editor.Bind(wx.EVT_KILL_FOCUS, self.OnKillFocus)
+
+
+    def OnKillFocus(self, event):
+
+        row,col = self.GetGridCursorRow(),self.GetGridCursorCol()
+        val = self.GetCellValue(row,col)
+
+        try :
+            float(val)
+        except:
+            val = "0.0"
+
+        self.SetCellValue(col,row,val) 
+
+
+        self.SaveEditControlValue()
+        self.HideCellEditControl()
+
+        self.solver.setMatrixElement(row,col,float(val))
+        self.solver.setMatrixElement(col,row,float(val))
+
+    def OnMenuOpen(self, event):
+        self.HideCellEditControl()    
+
+
+    def OnCut(self, event): # Cut selection
+        """ Cuts the selection """
+        self.grid.Cut()
+        self.PositionUpdate()
+
+    def OnCopy(self, event): # Copy Selection
+        """ Copies the selection """
+        self.grid.Copy()
+        self.PositionUpdate()
+        event.skip()
+
+    def OnPaste(self, event): # Paste Selection
+        """ Paste the Cut or Copied elements from the clipboard """
+        self.grid.Paste()
+        self.PositionUpdate()
+
+    def OnDelete(self, event): # Delete the selection
+        """ Deletes the selected portion """
+        fromHere, toHere = self.control.GetSelection()
+        self.control.Remove(fromHere, toHere)	
+
+
+class ResultsMatrix(wx.grid.Grid):
+
+    COL_WIDTH = 40
+    FMT = "%.4G"
+    COPY_DELIM = '\t'
+
+    def __init__(self, parent, ID=-1, label="", pos=wx.DefaultPosition, size=(-1, -1),row_labels=[],col_labels=[]): 
+
+        wx.grid.Grid.__init__(self,parent,ID,pos,size,wx.RAISED_BORDER,label)
+        self.solver = self.GetParent().GetGrandParent().huckel_solver
+
+        num_rows = self.solver.getSize()
+
+        num_cols = num_rows
+        self.CreateGrid(num_cols,num_rows)
+
+        self.setLabels(row_labels,col_labels)
+
+        self.SetMargins(5,5)
+        self.SetDefaultColSize(self.COL_WIDTH)
+        #self.SetRowLabelSize(60)
+
+        data = numpy.mat(numpy.zeros((num_rows,num_rows),float))
+
+        self.setData(data)
+
+        self.Bind(wx.EVT_KEY_UP,self.onKeyPress)
+
+    def onKeyPress(self,event):
+
+        if event.ControlDown() and event.GetKeyCode() in [67,322]:
+            self.copy()
+
+        event.Skip()
+
+    def copy(self):
+        data = self.getData()
+        paster = wx.TextDataObject()
+
+        paste_data = ''
+        num_col = self.GetNumberCols()
+        num_row = self.GetNumberRows()
+
+        for ii in range(num_row):
+            paste_data += self.COPY_DELIM.join([str(data[ii,jj]) for jj in range(num_col)]+['\n'])
+        paster.SetText(paste_data)
+
+        if wx.TheClipboard.Open():
+            wx.TheClipboard.SetData(paster)
+            wx.TheClipboard.Close()
+
+    def getData(self):
+        num_row = self.GetNumberRows()
+        num_col = self.GetNumberCols()
+        data = numpy.mat(numpy.zeros((num_row,num_col),float))
+        for ii in range(num_row):
+            for jj in range(num_col):
+                val = self.GetCellValue(ii,jj)
+                if val =="":
+                    val = '0'
+                data[ii,jj] = float(val)
+        return data
+
+
+
+    def setLabels(self,row_labels=[],col_labels=[],reverse=False):
+        num_rows = self.GetNumberRows()
+        num_cols = self.GetNumberCols()
+        for ii in range(num_cols):
+            if len(col_labels) >= num_cols:
+                label = col_labels[ii]
+            else:
+                label = str(ii+1)
+            self.SetColLabelValue(ii,label)
+
+        for ii in range(num_rows):
+            
+            if len(row_labels) >= num_rows:
+                label = row_labels[ii]
+            else:
+                label = str(ii+1)
+
+            if reverse:
+                self.SetRowLabelValue(num_rows-ii-1,label)
+            else:
+                self.SetRowLabelValue(ii,label)
+            
+            self.AutoSizeRowLabelSize(ii)
+            
+        self.ForceRefresh()
+
+
+    def setData(self,data,reverse=False):
+        
+        size_ii,size_jj = data.shape
+        
+        
+        for ii in range(size_ii):
+            for jj in range(size_jj):
+                val = data[ii,jj]
+                if abs(val)<settings.eps:
+                    val = 0.0
+
+                if reverse:
+                    self.SetCellValue(size_ii-ii-1,jj, self.FMT %(val))
+                    self.SetReadOnly(size_ii-ii-1,jj,True)
+                else:
+                    self.SetCellValue(ii,jj, self.FMT %(val))
+                    self.SetReadOnly(ii,jj,True)
+
+        self.AutoSizeRows()
+        self.AutoSizeColumns()
+        
+    def setSize(self,row_size,col_size=-1):
+        
+        if col_size<0:
+            col_size = row_size
+            
+        cur_size = self.GetNumberCols()
+
+        diff = col_size - cur_size
+        if diff > 0:
+            self.AppendCols(diff,updateLabels=False)
+
+        if diff < 0 and col_size>-1:
+            diff = abs(diff)
+            self.DeleteCols(cur_size-diff,diff,updateLabels=False)
+
+        cur_size = self.GetNumberRows()
+        diff = row_size - cur_size
+
+        if diff > 0:
+            self.AppendRows(diff,updateLabels=False)
+        if diff < 0 and row_size>-1:
+            diff = abs(diff)
+            self.DeleteRows(cur_size-diff,diff,updateLabels=False)
+        
+    def refreshFromHuckel(self):
+        pass
+
+
+class AtomAtomPolarizabilityMatrix(ResultsMatrix):
+
+    def __init__(self, parent, ID=-1, label="", pos=wx.DefaultPosition, size=(100, 25),row_labels=[],col_labels=[]): 
+        ResultsMatrix.__init__(self, parent, ID=ID, label=label, pos=pos, size=size,row_labels=row_labels,col_labels=col_labels)
+
+    def refreshFromHuckel(self):
+        self.setSize(self.solver.getSize())
+        data = self.solver._calcAAPolarizability() #aa_polar
+
+        if len(data)>0:
+            self.setLabels()
+            self.setData(data)
+
+
+class NetChargeMatrix(ResultsMatrix):
+
+    def __init__(self, parent, data_name,ID=-1, label="", pos=wx.DefaultPosition, size=(100, 25),row_labels=[],col_labels=[]): 
+        self.data_name = data_name
+        ResultsMatrix.__init__(self, parent, ID=ID, label=label, pos=pos, size=size,row_labels=row_labels,col_labels=col_labels)
+
+        
+    def refreshFromHuckel(self):
+        self.solver._calcBondOrders()
+        data = self.solver._calcNetCharges()#net_charges
+        na = self.solver.getSize()
+        if na >= 1:
+            self.setSize(1,na)
+        else:
+            self.setSize(0)
+
+        if len(data)>0:
+            disp_data = numpy.mat(numpy.zeros((1,na),float)) 
+            
             col_labels = ["Atom\n%d" % (x+1)for x in range(len(data))]
-            row_labels = ["Net Charge"]
+            row_labels = ["Charge"]
             
             for ii in range(na):
                 val = data[ii]
                 disp_data[0,ii] = val 
-                    
+            disp_data -=  numpy.mat(numpy.ones((1,na),float)) 
             self.setLabels(row_labels,col_labels)
 
             self.setData(disp_data)
@@ -365,11 +771,10 @@ class ControlPanel(wx.Panel):
         self.GetParent().sketch_pad.current_atom_type = atype
         
     def onClear(self,event):
+
+        self.solver.reset()
         if self.GetParent().visual_mode.IsChecked():
             self.sketch_pad.reset()
-        self.solver.reset()
-
-
 
     def onMinimize(self,event):
         if len(self.sketch_pad.molecule.atom_stack)>0:
