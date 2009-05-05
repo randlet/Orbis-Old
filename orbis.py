@@ -15,6 +15,7 @@ import numpy
 from editatombond import EditAtomTypes
 from help import About
 import os
+import pickle
 import sys
 
 
@@ -35,7 +36,7 @@ ID_SELECTALL = 204
 
 class MainFrame(wx.Frame):
 
-    def __init__(self, *args, **kwds):
+    def __init__(self, fname,*args, **kwds):
 
         wx.Frame.__init__(self, *args, **kwds)
 
@@ -102,6 +103,9 @@ class MainFrame(wx.Frame):
         self.huckel_solver.addListener(self.basisSizeChange)
         
         self.file_name = None
+        self.save_required = False
+        self.huckel_solver.addListener(self.setSaveRequired)
+        
         self.SetTitle('Orbis - Simple Huckel Solver: Untitled')
         self.Bind(wx.EVT_KEY_DOWN,self.onKeyPressBasis)
 #        self.Bind(wx.EVT_IDLE,self.huckel_solver.update)
@@ -113,7 +117,13 @@ class MainFrame(wx.Frame):
         self.doLayout()
         self.checkTimeBomb()
         self.results_display.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED,self.OnNoteBookPage)        
+        
+        if fname != None:
+            self.loadFile(fname)
         # end wxGlade
+        
+    def setSaveRequired(self):
+        self.save_required = True
         
     def handleResultsRefreshFromHuckel(self):
 
@@ -196,8 +206,8 @@ class MainFrame(wx.Frame):
                 ('Save Session &As...\tCtrl+Shift+S','Save the current session as...',self.OnSaveAs),
                 (),
                 ('Import &Geometry Data...\tCtrl+G','Import molecule geometry data from a file',self.OnImportGeom),
-                ('Import &Huckel Matrix...\tCtrl+H','Import Huckel matrix data from a text file',self.OnImportHuck),
-                ('&Export Results...','Export results of Huckel Calculation',self.OnExport),
+                ('Import &Huckel Determinant...\tCtrl+H','Import Huckel determinant data from a text file',self.OnImportHuck),
+                ('&Export Results...\tCtrl+E','Export results of Huckel Calculation',self.OnExport),
                 (),
                 ('&Quit\tCtrl+Q' ,'Terminate Scimple Huckel Solver',self.OnQuit))
 
@@ -205,12 +215,30 @@ class MainFrame(wx.Frame):
         return (('&Copy\tCtrl+C','Copy selected data to the clipboard',self.OnCopy),)    
 
     def helpMenuData(self):
-        return (('&About...','Information about Orbis',self.onAbout),)    
+        return (('&About...','Information about Orbis',self.onAbout),
+                ('&Documentation...','Information about the operation of Orbis',self.onDocs),
+                ('&Visit the Orbis website...','Purchase the full version of Orbis or check the latest documentation',self.onWeb),                
+                )    
     
     def viewMenuData(self):
-        return (('&Visual Mode\tCtrl+I',"Switch between visual (molecule) mode and general matrix mode",self.onVisualMode,wx.ITEM_CHECK),
-                ('&Redraw\tCtrl+R',"Redraw the current molecule",self.controls.onMinimize),)
-                
+        return (('&Visual Mode\tCtrl+I',"Switch between visual (molecule) mode and general determinant mode",self.onVisualMode,wx.ITEM_CHECK),
+                ('&Redraw\tCtrl+R',"Redraw the current molecule",self.controls.onMinimize),
+                ('&Zoom In\tCtrl+=',"Zoom in on molecule sketch pad",self.onZoomIn),
+                ('&Zoom Out\tCtrl+-',"Zoom out of molecule sketch pad",self.onZoomOut),
+                ('&Rotate Clockwise\tCtrl+Shift+=',"Rotate the molecule clockwiwe",self.onRotClock),
+                ('&Rotate Counter Clockwise\tCtrl+Shift+-',"Rotate the molecule counter-clockwiwe",self.onRotCClock),
+                )
+    
+    def onRotClock(self,event):
+        self.sketch_pad.rotate(-1)
+    def onRotCClock(self,event):
+        self.sketch_pad.rotate(1)
+    
+    def onZoomIn(self,event):
+        self.sketch_pad.resize(1)
+    def onZoomOut(self,event):
+        self.sketch_pad.resize(-1)
+
     def toolMenuData(self):
         return (('&Edit Atom Types...\tCtrl+A','Edit an existing atom type or add a new type of atom to the existing list',self.OnEditAtomType),
                 ('&Edit Bond Types...\tCtrl+B','Edit an existing bond type or add a new type of bond to the existing list',self.OnEditBondType))
@@ -237,10 +265,15 @@ class MainFrame(wx.Frame):
         
         menu_view = self.createMenu(self.viewMenuData())
 
-        
+
         self.visual_mode = menu_view.GetMenuItems()[0]
         self.visual_mode.Check(True)
         self.redraw = menu_view.GetMenuItems()[1]
+        self.zoomi = menu_view.GetMenuItems()[2]
+        self.zoomo = menu_view.GetMenuItems()[3]
+        self.rotc = menu_view.GetMenuItems()[4]
+        self.rotcc = menu_view.GetMenuItems()[5]
+        self.menu_view_items = [self.redraw,self.zoomi,self.zoomo,self.rotc,self.rotcc]
 
         menu_tools = self.createMenu(self.toolMenuData())
         menu_help = self.createMenu(self.helpMenuData())        
@@ -255,7 +288,21 @@ class MainFrame(wx.Frame):
     
     def onAbout(self,event):
         About(self).ShowModal()
-        
+
+    def onDocs(self,event):
+        try:
+            import webbrowser
+            webbrowser.open(settings.doc_root)
+        except:
+            wx.MessageBox('Unable to find the documentation files. Please visit www.simplehuckel.com/docs.html instead',"Can't find documentation",style=wx.ICON_ERROR)
+
+    def onWeb(self,event):
+        try:
+            import webbrowser
+            webbrowser.open(settings.website)
+        except:
+            wx.MessageBox('Unable to open %s' % (settings.website),"Can't find website",style=wx.ICON_ERROR)
+            
     def OnEditAtomType(self,event):
         atom_dlg = EditAtomTypes()
         
@@ -388,7 +435,7 @@ class MainFrame(wx.Frame):
         wildcard = "Comma Separated Value (*.csv)|*.csv|"\
                  "All (*.*)|*.*"
         
-        file_dlg = wx.FileDialog(self,"Import Huckel Matrix Data",wildcard=wildcard,style=wx.OPEN)
+        file_dlg = wx.FileDialog(self,"Import Huckel Determinant Data",wildcard=wildcard,style=wx.OPEN)
 
         if file_dlg.ShowModal() == wx.ID_OK:
             
@@ -404,7 +451,7 @@ class MainFrame(wx.Frame):
         outfile = open(fname,'w')
         size = self.huckel_solver.getSize()
         fmt = "%.4G"
-        outfile.write('Huckel Matrix\n')
+        outfile.write('Huckel Determinant\n')
         huckel_dat =self.huckel_solver.data.tolist()
         outfile.write(','+','.join(["%d" % (x+1) for x in range(size)])+'\n')
         for ii,row in enumerate(huckel_dat):
@@ -467,83 +514,87 @@ class MainFrame(wx.Frame):
                     
         file_dlg.Destroy()
 
-    def OnLoad(self,event):
-        import pickle
-        file_dlg = wx.FileDialog(self,"Choose a saved session file",wildcard="*.huc")
-        result = file_dlg.ShowModal()
-        self.level_pointer = 0
-#        self.setLevelPointer(0)
+    def loadFile(self,fpath):
+#        try:
+            f= open(fpath,'rb')
+            session_dict = pickle.load(f)
+            f.close()
+            self.file_name = fpath
 
-        if result == wx.ID_OK:
-    
+            if session_dict["mode"] == "visual":
 
-            try:
-                f= open(file_dlg.GetPath(),'rb')
-                session_dict = pickle.load(f)
-                f.close()
-                self.file_name = file_dlg.GetPath()
+                self.visual_mode.Check(True)
+                self.setVisualMode()                                        
 
-                if session_dict["mode"] == "visual":
-
-                    self.visual_mode.Check(True)
-                    self.setVisualMode()                                        
-
-                    n_a = len(session_dict["atoms"])
-                    n_b = len(session_dict["bonds"])
-                    data = numpy.mat(numpy.zeros((n_a,n_a)),float)
-                    for ii, atom in enumerate(session_dict["atoms"]):
-                        x,y,hx,sym = atom
-                        data[ii,ii] = hx
+                n_a = len(session_dict["atoms"])
+                n_b = len(session_dict["bonds"])
+                data = numpy.mat(numpy.zeros((n_a,n_a)),float)
+                for ii, atom in enumerate(session_dict["atoms"]):
+                    x,y,hx,sym = atom
+                    data[ii,ii] = hx
                         #make sure all atom types are present
 #                        if sym not in Atom.ATOM_TYPES.keys():
 #                            Atom.ATOM_TYPES[sym] = {settings.h_delim:hx,"description":sym}
                             
 #                        self.sketch_pad.addNewAtom(x,y,hx,sym)
 
-                    for bond in session_dict["bonds"]:
-                        con,k_xy = bond
-                        data[con[0],con[1]] = k_xy
-                        data[con[1],con[0]] = k_xy
+                for bond in session_dict["bonds"]:
+                    con,k_xy = bond
+                    data[con[0],con[1]] = k_xy
+                    data[con[1],con[0]] = k_xy
 
 
-                    self.sketch_pad.createFromHuckel(data,False)
+                self.sketch_pad.createFromHuckel(data,False)
 
-                    self.huckel_solver.setData(data,session_dict["num_e"])                        
+                self.huckel_solver.setData(data,session_dict["num_e"])                        
+                
+                for ii,props in enumerate(session_dict["atoms"]):
+                    atom = self.sketch_pad.molecule.atom_stack[ii]
+                    atom.setData(*props)
+
                     
-                    for ii,props in enumerate(session_dict["atoms"]):
-                        atom = self.sketch_pad.molecule.atom_stack[ii]
-                        atom.setData(*props)
-
-                        
-                    for ii,props in enumerate(session_dict["bonds"]):
-                        con,k_xy = props
-                        bond = self.sketch_pad.molecule.getBond(con[0],con[1])
-                        bond.k_xy = k_xy 
-                        bond.refresh()
-                        
+                for ii,props in enumerate(session_dict["bonds"]):
+                    con,k_xy = props
+                    bond = self.sketch_pad.molecule.getBond(con[0],con[1])
+                    bond.k_xy = k_xy 
+                    bond.refresh()
+                    
 ##                        make sure this bond exists int he bond types
-                        #Bond.AddBond(a,b,k_xy)
+                    #Bond.AddBond(a,b,k_xy)
 
-                    self.sketch_pad.draw()
-                    self.eld.draw()
-                    self.results_display_2dmo.draw()
+                self.sketch_pad.draw()
+                self.eld.draw()
+                self.results_display_2dmo.draw()
 
-                    self.sketch_pad.resize()
-                else:
-                    
-                    self.huckel_solver.setData(session_dict["data"],session_dict["num_e"])
-                    #self.visual_mode.Check(False)
-                    self.setVisualMode(False)
+                self.sketch_pad.resize()
+            else:
+                
+                self.huckel_solver.setData(session_dict["data"],session_dict["num_e"])
+                #self.visual_mode.Check(False)
+                self.setVisualMode(False)
 
+            self.SetTitle('Orbis - Simple Huckel Solver: %s' % (self.file_name))
 #                self.huckel_solver.setNumElectrons(session_dict["num_e"])
                 
-            except:
-                wx.MessageBox("Error while loading %s" % file_dlg.GetFilename(),style = wx.ICON_ERROR)
+#        except:
+#            wx.MessageBox("Error while loading %s" % fpath,style = wx.ICON_ERROR)
                 
+        
+    def OnLoad(self,event):
+        
+        file_dlg = wx.FileDialog(self,"Choose a saved session file",wildcard="*.huc")
+        result = file_dlg.ShowModal()
+        self.level_pointer = 0
+#        self.setLevelPointer(0)
+
+        if result == wx.ID_OK:
+            self.loadFile(file_dlg.GetPath())
+
         file_dlg.Destroy()
-        self.SetTitle('Orbis - Simple Huckel Solver: %s' % (self.file_name))
+
         
     def setVisualMode(self,vis_mode=True):
+        
         if vis_mode:
             self.visual_mode.Check(True)            
             self.sketch_pad.reset()
@@ -558,7 +609,9 @@ class MainFrame(wx.Frame):
 #            if self.results_display_2dmo.refreshFromHuckel not in self.huckel_solver.listeners:
 #                self.huckel_solver.addListener(self.results_display_2dmo.refreshFromHuckel)
                 
-            self.redraw.Enable(True)
+            for x in self.menu_view_items:
+                x.Enable(True)
+#            self.redraw.Enable(True)
             self.controls.minimize.Enable(True)
             self.main_sizer.Show(self.sketch_pad,recursive=True)
             self.results_sizer.Show(self.results_display_2dmo,recursive=True)
@@ -577,7 +630,10 @@ class MainFrame(wx.Frame):
   #          if self.results_display_2dmo.refreshFromHuckel in self.huckel_solver.listeners:
   #              self.huckel_solver.removeListener(self.results_display_2dmo.refreshFromHuckel)
                 
-            self.redraw.Enable(False)
+#            self.redraw.Enable(False)
+            for x in self.menu_view_items:
+                x.Enable(False)
+
             self.controls.minimize.Enable(False)
             self.main_sizer.Hide(self.sketch_pad,recursive=True)
             self.results_sizer.Hide(self.results_display_2dmo,recursive=True)
@@ -594,16 +650,36 @@ class MainFrame(wx.Frame):
 
             
         self.Layout()            
-        
-    def onVisualMode(self,event):
 
-        if self.visual_mode.IsChecked():
-            if wx.MessageBox("Switching to visual mode will clear the current session. Are you sure you want to continue?","Visual mode",style=wx.YES_NO|wx.ICON_QUESTION) == wx.YES:
+    def checkSaveRequired(self):
+        if self.save_required:
+            result = wx.MessageBox('Any unsaved changes you have made will be lost. Save now?',style=wx.YES_NO|wx.CANCEL)
+            if  result == wx.YES:
+                r2 = self.OnSaveAs(None)
+                if  r2 == wx.ID_CANCEL:
+                    result = wx.CANCEL
 
-                self.setVisualMode()
+            if result in (wx.YES, wx.NO):
+                self.save_required = False
         else:
-            self.setVisualMode(False)
+            result = wx.NO
 
+        return result
+    
+    def onVisualMode(self,event):
+        result = self.checkSaveRequired()
+
+        self.OnNew(None)        
+        if result != wx.CANCEL:
+            #print self.visual_mode.IsChecked()
+            
+            if self.visual_mode.IsChecked():
+                self.setVisualMode()
+                
+            else:
+                self.setVisualMode(False)
+
+    
         
     def OnGridEditorCreated(self, event):
         """ Bind the kill focus event to the newly instantiated cell editor """
@@ -617,34 +693,37 @@ class MainFrame(wx.Frame):
 
        
     def saveFile(self,fname):
-        import pickle
-        session_dict ={"version":settings.version}
-        session_dict["num_e"] = self.controls.num_e.GetValue()
-
-        if self.visual_mode.IsChecked():
-            session_dict["mode"] = "visual"
-            atoms = []
-            bonds = []
-            molecule = self.sketch_pad.molecule            
-            for atom in molecule.atom_stack:
-                atoms.append([atom.x,atom.y,atom.hx,atom.sym])
-            for bond in molecule.bond_stack:
-                ai,bi = molecule.atom_stack.index(bond.a),molecule.atom_stack.index(bond.b)
-                bonds.append([(ai,bi),bond.k_xy])
-        
-            session_dict["atoms"] = atoms
-            session_dict["bonds"] = bonds
+        try:
+            import pickle
+            session_dict ={"version":settings.version}
+            session_dict["num_e"] = self.controls.num_e.GetValue()
+    
+            if self.visual_mode.IsChecked():
+                session_dict["mode"] = "visual"
+                atoms = []
+                bonds = []
+                molecule = self.sketch_pad.molecule            
+                for atom in molecule.atom_stack:
+                    atoms.append([atom.x,atom.y,atom.hx,atom.sym])
+                for bond in molecule.bond_stack:
+                    ai,bi = molecule.atom_stack.index(bond.a),molecule.atom_stack.index(bond.b)
+                    bonds.append([(ai,bi),bond.k_xy])
             
-        else:
-            session_dict["mode"] = "general"
-            session_dict["data"] = self.huckel_solver.data
+                session_dict["atoms"] = atoms
+                session_dict["bonds"] = bonds
+                
+            else:
+                session_dict["mode"] = "general"
+                session_dict["data"] = self.huckel_solver.data
+                
+            output = open(fname,'wb')
+            pickle.dump(session_dict,output)
+            output.close()
             
-        output = open(fname,'wb')
-        pickle.dump(session_dict,output)
-        output.close()
-        
-        self.file_name = fname
-        
+            self.file_name = fname
+            self.save_required=False
+        except:
+            wx.MessageBox('There was a problem writing to %s. Please try again.' %(fname),style=wx.ICON_ERROR)
         
 
     def OnSaveAs(self,event):
@@ -665,16 +744,23 @@ class MainFrame(wx.Frame):
                     self.saveFile(fname)
                     
         save_dlg.Destroy()
-        self.SetTitle('Orbis - Simple Huckel Solver: %s' % (self.file_name))
+        if result != wx.ID_CANCEL:
+            self.SetTitle('Orbis - Simple Huckel Solver: %s' % (self.file_name))
+        return result
+        
+    
     def OnSave(self,event):
         if self.file_name == None:
-            self.OnSaveAs(event)
+            result = self.OnSaveAs(event)
         else:
-            self.saveFile(self.file_name)
-            self.SetTitle('Orbis - Simple Huckel Solver: %s' % (self.file_name))
+            result = self.saveFile(self.file_name)
+            if result != wx.CANCEL:
+                self.SetTitle('Orbis - Simple Huckel Solver: %s' % (self.file_name))
+        return result
+    
     def OnNew(self,event):
-        do_new = wx.MessageBox("Any unsaved work will be lost.  Do you want to start a new session?","New Session?",style=wx.YES_NO)
-        if do_new == wx.YES:
+        result = self.checkSaveRequired()
+        if result in (wx.YES,wx.NO):
             self.file_name = None
             self.controls.onClear(None)
             self.SetTitle('Orbis - Simple Huckel Solver: Untitled')
@@ -750,9 +836,7 @@ class MainFrame(wx.Frame):
 
 if __name__ == "__main__":
 
-#    try:
-        
-
+    try:
 
         import settings
         import huckelsolver
@@ -773,14 +857,19 @@ if __name__ == "__main__":
 
         app = wx.PySimpleApp(0)
         wx.InitAllImageHandlers()
-        main_frame = MainFrame(None, -1, "Orbis - Simple Huckel Solver")
+        if len(sys.argv)>1:
+            fpath = sys.argv[1].strip()
+        else:
+            fpath = None
 
-        
+        main_frame = MainFrame(fpath,None, -1, "Orbis - Simple Huckel Solver")
+
         app.SetTopWindow(main_frame)
+        
+            
         main_frame.Show()
         app.MainLoop()
-        
-    #except:
-        #print sys.exc_info()
-    #finally:
-        #settings.logfile.close()
+    except:
+        print sys.exc_info()
+    finally:
+        settings.logfile.close()

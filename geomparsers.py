@@ -29,7 +29,6 @@ class GeomParser():
                     sym,x1,y1,z1 = a1
                     sym,x2,y2,z2 = a2
                     r2 = (x2-x1)**2+(y2-y1)**2+(z2-z1)**2
-                    print r2**0.5,bond_dist
                     if r2 <= bd2:
                         bonds.append((ii,jj,1))
                         

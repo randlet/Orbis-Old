@@ -3,7 +3,8 @@ import sys
 root = os.path.dirname(os.path.abspath(sys.argv[0]))
 logfilen = logfile = root+'/simple_huckel.log'
 logfile = open(logfilen,'w')
-#sys.stdout = logfile
+
+sys.stdout = logfile
 
 logfile.write(sys.argv[0])
 logfile.flush()
@@ -16,6 +17,8 @@ tool_tip_time = 4
 
 #equivalnce threshold i.e. abs(a-b)<eps implies a=b
 eps = 1.E-10
+
+doc_root = root+'/docs/docs.html'
 
 
 image_dir = root+'/images'

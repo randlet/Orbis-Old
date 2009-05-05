@@ -57,7 +57,8 @@ class EigenPlotPanel(PlotPanel):
     def initializePlot(self):
     
         self.subplot = self.figure.add_subplot( 111 )
-        self.figure.suptitle('Orbitals')
+        self.figure.subplots_adjust(left=0.05,right=0.95,top=0.925,bottom=0.05)
+        self.figure.suptitle('Molecular Orbitals')
         self.setPlotProperties()
         self.drawLegend()                    
         self.setPlotProperties()
@@ -167,4 +168,4 @@ class EigenPlotPanel(PlotPanel):
             else:
                 ha,va='left','bottom'
                 dx,dy= delta,delta
-            self.subplot.text(x+dx,y+dy,str(ii+1),ha=ha,va=va,size='large',zorder=20,color='black')              
+            self.subplot.text(x+dx,y+dy,"%s$_{i=%d}$" %(self.molecule.atom_stack[ii].sym,ii+1),ha=ha,va=va,size='large',zorder=20,color='black')              

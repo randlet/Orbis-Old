@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+    <title>Orbis - Simple Huckel Molecular Orbitals (SHMO) by Heaviside Software - Help and FAQ's</title>
+    <meta name="description" content="Software for performing Simple Huckel Molecular Orbital (SHMO) calculations."/>
+    <meta name="keywords" content="Simple Huckel, Orbital, Molecular, SHMO, 
+
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+
+</head>
+
+<body>
+
+    <div class="header">
+
+        <div class="logo">Orbis</div><br/>
+        <div class="logo_under">by Heaviside Software</div>
+
+    </div>
+
+    
+    <div class="gutter"></div>
+
+    <div class="col1">  
+
+        <h1>Orbis Help</h1>
+    
+        
+        <h2>Importing and Exporting Data</h2> 
+
+        
+		<h3>Exporting your results</h3>
+		<p>
+			Orbis allows you to export the results of your calculations to Comma Seperated Value (.csv) format that can be read by all spreadsheet programs.
+			To export the Huckel determinant and all of the numerical results of your calculation, simply choose the "Export Results..." (or use Ctrl+E) option
+			from the File menu.
+		</p>
+		
+		<h3>Importing data</h3>
+		<p>
+			<b>Importing molecular geometry data:</b> Orbis can currently import molecular geometry information from the following 
+			<a href="http://en.wikipedia.org/wiki/Chemical_file_format">chemical file formats</a>:
+			<ul>
+				<li><a href="http://en.wikipedia.org/wiki/MDL_Molfile">MDL Molfiles (.mol)</a></li>
+				<li><a href="http://en.wikipedia.org/wiki/XYZ_file_format">XYZ files</a></li>
+				<li>tab,space or comma delimited text files of atomic types and coordinates (e.g each line of the file would contain a record like C,1.0,1.0,0.0)
+			</ul>
+			Note that the Z coordinate is always assumed to be 0. For XYZ and generic text files Orbis tries to guess where bonds are located and these may need 
+			to be adjusted manually after import.
+		</p>
+		
+		<p>
+			<b>Importing a Huckel determinant:</b>Orbis also allows you to import a Huckel determinant from a text file and will automatically construct a molecule
+			for you based on the determinant.  For example if you had a text file with the following format:
+<pre>
+ 0	-1	 0	 0	 0
+-1	 0	-1	 0	 0
+ 0	-1	 0	-1	 0
+ 0	 0	-1 	 0	-1
+-1	 0	 0	-1	 0
+</pre>
+			Then Orbis would draw the following structure:<br/><br/>
+			<img src="images/import_huck.png" alt="imported huckel determinant data"/>
+			
+		</p>
+		
+		<p>
+			If there are other formats you would like Orbis to support, please send an email to <a href="mailto:mail@simplehuckel.com">mail@simplehuckel.com</a>.
+		</p>
+		
+		<p>
+			You can learn more about some of the other features with the links below.
+			<ul>
+				<li><a href="docs.html">Quick Start Guide</a></li>
+                <li><a href="results.html">Calculated Results</a></li>
+                <li><a href="importexport.html">Importing and Exporting Data</a></li>
+            </ul>
+			<br/><br/>
+		</p>	
+			
+    </div>
+
+    <div class="col2">
+
+        <h1>FAQ</h1>
+
+        <p> Coming soon... </p>
+
+        <p>Got a question? Email it to <a href="mailto:mail@simplehuckel.com">mail@simplehuckel.com</a>!
+
+        
+    </div>
+
+    <div class="footer">
+        <a href="./">homepage</a> | <a href="mailto:mail@simplehuckel.com">contact</a> | <a href="http://validator.w3.org/check?uri=referer">html</a> | <a href="http://jigsaw.w3.org/css-validator">css</a> |  &copy; 2009 Heaviside Software| Design by <a href="http://www.mitchinson.net"> www.mitchinson.net</a><br/>
+        <!--This website template is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/3.0/">Creative Commons Attribution 3.0  License</a>-->
+    </div>
+
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-5990208-4");
+pageTracker._trackPageview();
+} catch(err) {}</script>    
+</body>
+</html>

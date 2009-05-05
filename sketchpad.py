@@ -14,7 +14,7 @@ from editatombond import EditBondTypes,EditAtomTypes
 class AtomTypeDialog(wx.Dialog):
     
     def __init__(self,atom,atom_num):
-        wx.Dialog.__init__(self,None,-1, 'Select Atom Properties')
+        wx.Dialog.__init__(self,None,-1, 'Select Atom Properties for atom %d' %(atom_num+1))
         
         ok_button = wx.Button(self,wx.ID_OK,"OK")
         ok_button.SetDefault()
@@ -26,7 +26,7 @@ class AtomTypeDialog(wx.Dialog):
         self.atom_type.SetToolTip(wx.ToolTip(Atom.ATOM_TYPES[self.atom_type.GetValue()]["description"]))
         self.Bind(wx.EVT_COMBOBOX,self.onAtomType,self.atom_type)
         
-        hx_txt = wx.StaticText(self, -1,u"Set hx for atom %d:" % (atom_num), style=wx.ALIGN_CENTRE,pos = (10,40))
+        hx_txt = wx.StaticText(self, -1,u"Set hx for atom %d:" % (atom_num+1), style=wx.ALIGN_CENTRE,pos = (10,40))
         self.hx = wx.TextCtrl(self, -1,str(atom.hx),validator=NumberValidator())
         self.hx.SetValue(str(atom.hx))
         
@@ -352,7 +352,8 @@ class MoleculePlotPanel(PlotPanel):
             atom_type = AtomTypeDialog(atom,a)
             result = atom_type.ShowModal()
             if result == wx.ID_OK:
-                atom.setData(atom.x,atom.y,-1.*abs(float(atom_type.hx.GetValue())),atom_type.atom_type.GetValue())
+#                atom.setData(atom.x,atom.y,-1.*abs(float(atom_type.hx.GetValue())),atom_type.atom_type.GetValue())
+                atom.setData(atom.x,atom.y,float(atom_type.hx.GetValue()),atom_type.atom_type.GetValue())
                 bonds = [bond for bond in self.molecule.bond_stack if bond.a == atom or bond.b == atom]
                 
                 for bond in bonds:
@@ -393,7 +394,8 @@ class MoleculePlotPanel(PlotPanel):
             result = bond_type.ShowModal()
             if result == wx.ID_OK:
                 
-                bond.k_xy = -1.*abs(float(bond_type.k_xy.GetValue()))
+#                bond.k_xy = -1.*abs(float(bond_type.k_xy.GetValue()))
+                bond.k_xy = float(bond_type.k_xy.GetValue())
                 if abs(bond.k_xy) < settings.eps:
                     self.deleteAtomOrBond(bond.artist)
                 #self.solver_update_needed = True
@@ -489,9 +491,10 @@ class MoleculePlotPanel(PlotPanel):
             else:
                 self.resize(1,event.xdata,event.ydata)
     #------------------------------------------------------------------------------------------------          
-    def rotate(self,dir,xo,yo):
-
-
+    def rotate(self,dir,xo=0,yo=0):
+        axis = self.subplot.axis()
+        xo =  (axis[1]+axis[0])/2.
+        yo =  (axis[3]+axis[2])/2.
         x = numpy.arange(0.,2*numpy.pi,0.05)
         trans = matplotlib.transforms.blended_transform_factory(self.subplot.transData,self.subplot.transAxes)
         for atom in self.molecule.atom_stack:
@@ -584,6 +587,7 @@ class MoleculePlotPanel(PlotPanel):
 
         self.subplot = self.figure.add_subplot( 111 )
         self.figure.suptitle('Molecule Sketch Pad')
+        self.figure.subplots_adjust(left=0.05,right=0.95,top=0.925,bottom=0.05)
         self.canvas.SetToolTip(self.tooltip)
         self.canvas.mpl_connect('button_press_event', self.mouseDown)
         self.canvas.mpl_connect('button_release_event', self.mouseUp)
@@ -642,10 +646,16 @@ class MoleculePlotPanel(PlotPanel):
         
 #------------------------------------------------------------------------------------------------                      
     def relable_atoms(self):
+        xs = []
+        ys = []
+        hxs = []
+        syms = []
         
-        xs = [atom.x for atom in self.molecule.atom_stack]
-        ys = [atom.y for atom in self.molecule.atom_stack]
-        syms = [atom.sym for atom in self.molecule.atom_stack]
+        for atom in self.molecule.atom_stack:
+            xs.append(atom.x)
+            ys.append(atom.y)
+            hxs.append(atom.hx)
+            syms.append(atom.sym)
         
         self.subplot.texts = []
         
@@ -664,4 +674,4 @@ class MoleculePlotPanel(PlotPanel):
             else:
                 ha,va='left','bottom'
                 dx,dy= delta,delta
-            self.subplot.text(x+dx,y+dy,"%s %d" % (syms[ii],ii+1),ha=ha,va=va,size='large',zorder=20,color='black')              
+            self.subplot.text(x+dx,y+dy,"%s $_{i=%d}$" % (syms[ii],ii+1),ha=ha,va=va,size='large',zorder=20,color='black')              

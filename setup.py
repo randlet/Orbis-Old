@@ -44,6 +44,12 @@ def_atomic_data = root+'/data/default/atomic_data.yaml'
 def_bond_data = root+'/data/default/bond_data.yaml'
 data_files += [('./data',[atomic_data,bond_data]),('./data/default',[def_atomic_data,def_bond_data])]
 
+doc_dir = root+'/docs'
+doc_img = doc_dir+'/images'
+images = [doc_img+'/'+x for x in os.listdir(doc_img) if x.find('.png')>=0]
+docs = [doc_dir+'/'+x for x in os.listdir(doc_dir) if x.find('.css')>=0 or x.find('.html')>=0]
+data_files+=[('./docs',docs),('./docs/images',images)]
+
 image_dir = root+'/images'
 image_files = [image_dir + x for x in ['/new.png','/open.png','/save.png','/icon.bmp']]
 data_files += [('./images',image_files)]

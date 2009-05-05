@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+    <title>Orbis - Simple Huckel Molecular Orbitals (SHMO) by Heaviside Software - Help and FAQ's</title>
+    <meta name="description" content="Software for performing Simple Huckel Molecular Orbital (SHMO) calculations."/>
+    <meta name="keywords" content="Simple Huckel, Orbital, Molecular, SHMO, 
+
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+
+</head>
+
+<body>
+
+    <div class="header">
+
+        <div class="logo">Orbis</div><br/>
+        <div class="logo_under">by Heaviside Software</div>
+
+    </div>
+
+
+    <div class="gutter"></div>
+
+    <div class="col1">  
+
+        <h1>Orbis Help</h1>
+    
+        
+        <h2>Simple Huckel Molecular Orbital Results</h2> 
+
+        
+		<h3>Energy Level Diagram</h3>
+		<p>
+			As you draw your molecule, Orbis will display an energy level diagram in the lower left hand pane.  Each line represents a molecular orbital energy level.
+			If an energy level is degenerate than the lines for each of the degenerate orbitals will be shown side by side. An example of this (the energy level diagram of 
+			<a href="http://en.wikipedia.org/wiki/Benzene">benzene</a>) is shown below.<br/><br/>
+			<img src="images/eld_benzene.png" alt="energy level diagram of benzene"/>
+		</p>
+		<p>
+			The color and line type of the energy level lines is used to indicate the number of electrons occupying that orbital 
+			(the number of electrons can be controlled using the spinner in the top left panel).  In cases where the highest occupied molecular orbital (HOMO)
+			is degenerate the number of electrons in each degenerate orbital is calculated as N<sub>e</sub>/N where N<sub>e</sub> is the number of electrons 
+			available to fill the degenerate orbitals and N is the level of degeneracy. For example if there are 3 electrons to fill 2 degenerate orbitals, each orbital
+			will be considered to be filled with 1.5 electrons.
+		</p>
+		<p>
+			The meaning of the different line types are as follows:
+			<ul>
+				<li>A solid black line indicates no electrons (N<sub>e</sub> = 0)</li>
+				<li>A dashed blue line indicates the number of electrons is between 0 and 1 (0 &lt; N<sub>e</sub> &lt; 1)</li>
+				<li>A solid blue line indicates the number of electrons is exactly 1 (N<sub>e</sub> = 1)</li>
+				<li>A dashed red line indicates the number of electrons is between 1 and 2 (1 &lt; N<sub>e</sub> &lt; 2)</li>
+				<li>A solid red line indicates the number of electrons is exactly 2 (N<sub>e</sub> = 2)
+			</ul>
+		</p>
+			
+		<p>
+			The energy level diagram can also be used to control the molecular orbital plot panel (discussed below). 
+			Clicking on one of the energy level lines will cause the molecular orbital plot panel to display the orbital associated with that energy level (eigenvalue). 
+			The corresponding eigenvalue/eigenvector in the Eigenvectors results tab will also be highlighted.  The currently selected molecular orbital is indicated in the
+			energy level diagram by two circular symbols on either end of the line.
+		</p>
+		
+		<h3>Molecular Orbitals</h3>
+		<p>
+			The molecular orbitals corresponding to the lowest and highest energy levels of benzne are shown below on the left and right, respectively. 
+			The corresponding eigenvectors are also shown.<br/><br/>
+			<img src="images/mos.png" style="width:450px;" alt="Lowest and highest energy molecular orbitals of benzene"/><br/>
+			The color of the orbital indicates the sign of the atomic orbitals coefficient in the eigenvector while the radis of the orbital is proportional to 
+			the magnitude of the coefficient.
+		</p>
+		<p>
+			You can change which molecular orbital is shown in this plot by clicking on one of the lines in the energy level diagram discussed above, or by clicking on 
+			one of the matrix rows in the Eigenvector tab. 
+		</p>
+			
+		<h3>Results notebook</h3>
+		<p>
+			The tabbed notebook in the bottom right hand panel presents the following list of calculated parameters:
+			<ul>
+				<li>Eigenvalues and eigenvectors</li>
+				<li><a href="http://en.wikipedia.org/wiki/Pi_bond">Pi bond</a> orders</li>
+				<li>Charge densities</li>
+				<li><a href="http://goldbook.iupac.org/AT06992.html">Atom-atom</a> polarizability</li>
+				<li><a href="http://goldbook.iupac.org/AT06993.html">Atom-bond</a> polarizability</li>
+			</ul>
+		</p>
+		<p>
+			You can learn more about some of the other features of Orbis with the links below.
+			<ul>
+				<li><a href="docs.html">Quick Start Guide</a></li>
+                <li><a href="sketch.html">The Molecule Sketch Pad and Huckel Determinant</a></li>
+                <li><a href="importexport.html">Importing and Exporting Data</a></li>
+            </ul>
+			<br/><br/>
+			
+    </div>
+
+    <div class="footer">
+        <a href="./">homepage</a> | <a href="mailto:mail@simplehuckel.com">contact</a> | <a href="http://validator.w3.org/check?uri=referer">html</a> | <a href="http://jigsaw.w3.org/css-validator">css</a> |  &copy; 2009 Heaviside Software| Design by <a href="http://www.mitchinson.net"> www.mitchinson.net</a><br/>
+        <!--This website template is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/3.0/">Creative Commons Attribution 3.0  License</a>-->
+    </div>
+
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-5990208-4");
+pageTracker._trackPageview();
+} catch(err) {}</script>    
+</body>
+</html>

@@ -159,11 +159,17 @@ class ELDPlotPanel (PlotPanel):
         if not hasattr( self, 'subplot' ):
             self.subplot = self.figure.add_subplot( 111 )
             self.figure.suptitle('Energy Level Diagram')
+            self.figure.subplots_adjust(left=0.15,right=0.95,top=0.925,bottom=0.05)
             self.canvas.SetToolTip(self.tooltip)
             self.canvas.mpl_connect('pick_event',self.pickEvent)
             self.canvas.mpl_connect('motion_notify_event', self.mouseMove)            
             self.canvas.mpl_connect('axes_enter_event',self.axesEnter)
+
             self.subplot.set_ylabel("Energy")
+            self.subplot.yaxis.set_label_coords(-0.125,0.5)
+
+
+
             self.subplot.set_xticklabels([""])            
             self.subplot.set_xticks([])            
             self.drawLegend()
@@ -173,7 +179,7 @@ class ELDPlotPanel (PlotPanel):
             self.width_space = self.width+self.space
             self.steps = 4
             self.step = self.width/self.steps
-            self.height_fac = 0.2
+            self.height_fac = 0.25
             
         else:
             for artist in self.subplot.get_children():
@@ -379,7 +385,8 @@ class HuckelMatrix(wx.grid.Grid):
             else:
                 label = str(ii+1)
 
-            self.SetColLabelValue(ii,label)
+                self.SetRowLabelValue(ii,"i=%s" % (label))
+                self.SetColLabelValue(ii,"j=%s" % (label))
 
 
     def OnGridEditorCreated(self, event):
@@ -580,11 +587,14 @@ class AtomAtomPolarizabilityMatrix(ResultsMatrix):
         ResultsMatrix.__init__(self, parent, ID=ID, label=label, pos=pos, size=size,row_labels=row_labels,col_labels=col_labels)
 
     def refreshFromHuckel(self):
-        self.setSize(self.solver.getSize())
+        count = self.solver.getSize()
+        self.setSize(count)
         data = self.solver._calcAAPolarizability() #aa_polar
-
+        atom_nums = [(x+1) for x in range(count)]
         if len(data)>0:
-            self.setLabels()
+            row_labels = ["i=%d" % (x) for x in atom_nums]
+            col_labels = ["j=%d" % (x) for x in atom_nums]
+            self.setLabels(row_labels=row_labels,col_labels=col_labels)
             self.setData(data)
 
 
@@ -680,7 +690,8 @@ class EigenMatrix(ResultsMatrix):
         count = len(vecs)
         if count>0:
             row_labels = ["E = " +x for x in map(lambda x : "%5.3f" % (x),self.solver.eigen_vals)]
-            self.setLabels(row_labels=row_labels,reverse=True)
+            col_labels = ["C%d" % (x+1) for x in range(count)]
+            self.setLabels(row_labels=row_labels,col_labels=col_labels, reverse=True)
             
             self.setData(numpy.mat(vecs),reverse=True)
             lp = self.GetParent().GetGrandParent().level_pointer
@@ -695,12 +706,16 @@ class PiBondMatrix(ResultsMatrix):
         ResultsMatrix.__init__(self, parent, ID=ID, label=label, pos=pos, size=size,row_labels=row_labels,col_labels=col_labels)
 
     def refreshFromHuckel(self):
-
-        self.setSize(self.solver.getSize())
+        count = self.solver.getSize()
+        self.setSize(count)
 #        data = self.solver.bond_orders
         data = self.solver._calcBondOrders()
-#        if data.any():
-        self.setLabels()
+        atom_nums = [(x+1) for x in range(count)]
+        row_labels = ["i=%d" % (x) for x in atom_nums]
+        col_labels = ["j=%d" % (x) for x in atom_nums]
+        self.setLabels(row_labels=row_labels,col_labels=col_labels)
+
+
         self.setData(data)
 
 
@@ -772,9 +787,10 @@ class ControlPanel(wx.Panel):
         
     def onClear(self,event):
 
-        self.solver.reset()
         if self.GetParent().visual_mode.IsChecked():
             self.sketch_pad.reset()
+
+        self.solver.reset()
 
     def onMinimize(self,event):
         if len(self.sketch_pad.molecule.atom_stack)>0:

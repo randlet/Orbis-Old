@@ -112,7 +112,7 @@ class HuckelSolver(AbstractModel):
         self.bond_pairs = []
         for ii in range(data.shape[0]):
             for jj in range(ii):
-                data[ii,jj] = -1.*abs(data[ii,jj])
+#                data[ii,jj] = -1.*abs(data[ii,jj])
                 data[jj,ii] = data[ii,jj]
                 if ii != jj and abs(data[ii,jj])>settings.eps:
                     self.bond_pairs.append((ii,jj))
@@ -164,8 +164,8 @@ class HuckelSolver(AbstractModel):
         Inputs: row,col -> int, int >= 0
                 val -> val is converted to being a negative number automatically
         Outputs: None"""
-        if row != col:
-            val = -1.*abs(val)
+#        if row != col:
+#            val = -1.*abs(val)
         self.data[max(0,row),max(0,col)] = val
         self._solveHuckel()
         self.setNumElectrons(self.num_e)

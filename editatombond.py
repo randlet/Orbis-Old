@@ -23,7 +23,7 @@ class EditAtomTypes(wx.Dialog):
         
         self.atom_list = Atom.AtomNames(self.atom_types)
         
-        self.atom_type_ctrl = wx.ListBox(self,-1,(10,10),choices = self.atom_list,style=wx.LB_SINGLE)
+        self.atom_type_ctrl = wx.ListBox(self,-1,(10,10),choices = self.formatChoices(self.atom_list),style=wx.LB_SINGLE)
         self.atom_type_ctrl.Select(0)
         
         edit = wx.Button(self,-1,"Edit...",pos=(width-85,10))
@@ -37,7 +37,18 @@ class EditAtomTypes(wx.Dialog):
         restore = wx.Button(self,-1,"Restore...",pos=(width-85,100))
         restore.Bind(wx.EVT_BUTTON,self.OnRestore)
 
-    
+    def formatChoices(self,choices):
+
+        new_choices = []
+        for choice in choices:
+            pos = choice.index('-')
+            ns = 3-pos
+            name,des = choice.split('-')
+            des = des.strip()
+            name += ' '*ns
+            new_choices.append('%s- %s' % (name,des))
+        return new_choices
+        
     def OnRestore(self,event):
         atom_type = self.atomTypeFromSelection()
         result = wx.MessageBox("Restoring will erase all custom atoms defined. Do you want to restore atom types to the defaults?",style=wx.ICON_WARNING|wx.YES_NO)
@@ -51,8 +62,8 @@ class EditAtomTypes(wx.Dialog):
         edit = wx.Dialog(self,-1,'Select Properties for %s' % (name) ,size =(335,160))
 
         txt = wx.StaticText(edit, -1,u"Atom Type:",pos = (12,10))
-        self.atom_type = wx.TextCtrl(edit,-1,atom_type,pos=(70,10),size=(25,-1))
-        self.atom_type.SetMaxLength(2)
+        self.atom_type = wx.TextCtrl(edit,-1,atom_type,pos=(70,10),size=(35,-1))
+        self.atom_type.SetMaxLength(3)
         
         
         txt = wx.StaticText(edit, -1,u"Set hx for atom type %s:" % (atom_type), style=wx.ALIGN_CENTRE,pos = (10,40))

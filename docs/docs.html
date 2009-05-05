@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+    <title>Orbis - Simple Huckel Molecular Orbitals (SHMO) by Heaviside Software - Help and FAQ's</title>
+    <meta name="description" content="Software for performing Simple Huckel Molecular Orbital (SHMO) calculations."/>
+    <meta name="keywords" content="Simple Huckel, Orbital, Molecular, SHMO, 
+
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+
+</head>
+
+<body>
+
+    <div class="header">
+
+        <div class="logo">Orbis</div><br/>
+        <div class="logo_under">by Heaviside Software</div>
+
+    </div>
+
+    <div class="gutter"></div>
+
+    <div class="col1">  
+
+        <h1>Orbis Help</h1>
+    
+        <p> 
+            <ul>
+                <li><a href="#quickstart">Quick Start Guide</a></li>
+                <li><a href="sketch.html">The Molecule Sketch Pad and Huckel determinant</a>
+                    <ul>
+                        <li>Drawing and deleting atoms and bonds</li>
+                        <li>Changing atom and bond types</li>
+                        <li>Redrawing the canvas</li>
+                        <li>Zooming and rotating the canvas</li>
+                    </ul>
+                </li>
+                <li><a href="results.html">Calculated Results</a>
+                    <ul>
+                        <li>Energy Level Diagrams</li>
+                        <li>Molecular Orbital Diagrams</li>
+                        <li>Eigenvalues, Eigenvetors, Bond Orders, Charge Densities and Polarizabilities</li>
+                    </ul
+                </li>
+                <li><a href="importexport.html">Importing and Exporting Data</a>
+                    <ul>
+                        <li>Importing molecule geometry data and supported formats</li>
+                        <li>Importing Huckel determinant data</li>
+                        <li>Exporting your results to a spreadsheet format (csv)
+                    </ul>
+                </li>
+            </ul>
+                
+                
+        </p>
+        
+        <h2><a name="quickstart">Quick Start Guide</a></h2> 
+        
+        <p> Here is a
+        quick walk through of the steps to calculate the Simple Huckel
+        Molecular Orbitals of <a
+        href="http://en.wikipedia.org/wiki/Pyrrole">Pyrrole</a> with Orbis.
+        Pyrrole is a 5 membered ring system with the formula
+        C<sub>4</sub>H<sub>4</sub>NH. Since we are only considering the
+        pi-bond system we can ignore the H atoms and just draw the
+        carbons and nitrogens.
+        </p>
+
+        <p>        
+            Start off by selecting the C atom type from the drop down list:<br/>
+            <br/>
+            <img src="images/atom_select.png" alt="atom type drop down list"/>
+            <br/>
+
+            and then add 4 carbon atoms to the sketch pad by left-clicking in
+            the white sketch pad area.
+        </p>
+        
+        <p> Next add a nitrogen molecule by selecting the N3 atom type from
+        the drop down list. You will notice that there is both an N2 and and
+        an N3 atom type. The digit following the chemical symbol is the 
+        <a href="http://en.wikipedia.org/wiki/Coordination_number">coordination number</a> 
+        (the number of atoms that are attached to it). In this case the N is attached to 3 other 
+        atoms (2 C's and the H that we are ignoring) so use the N3 atom type.
+        </p>
+        
+         <p> You can now add bonds to the molecule by left-clicking on an atom and
+         while holding the button down, drag the mouse to another atom and release it.
+         You should see a red line attaching the two atoms now. Join up the 5 atoms so
+         that a ring is formed and then have Orbis automatically "clean up" your
+         sketch a bit by pressing the "Redraw" button on the left:<br/><br/>
+		 You should have a molecule that  looks something like the following:<br/><br/>
+
+        <img src="images/pyrrole_clean.png" alt="pyrrole molecule after redraw"/>
+        </p>
+		
+		<p>
+			Notice that while you were drawing the molecule Orbis was filling in the 
+			Huckel determinant with the appropriate values,<br/><br/>
+			<img src="images/pyrrole_huck_mat.png" alt="pyrrole Huckel determinant"/>
+			<br/>
+			creating an energy level diagram and molecular orbital plot,<br/><br/>
+			<img src="images/pyrrole_eld_mo.png" alt="pyrrole energy level diagram and molecular orbital plot"/>
+			<br/>
+			and calculating the eigenvalues, eigenvectors, pi-bond orders, charge densities as well 
+			as atom-atom & atom-bond polarizabilities.<br/><br/>
+			<img src="images/pyrrole_notebook.png" alt="pyrrole eigenvalues and eigenvectors"/>
+			<br/>
+			Clicking on one of the other energy level lines in the energy level diagram (or alternatively one of 
+			the rows of the eigenvector matrix)
+			will show you what the molecular orbital looks like for that energy level.<br/><br/>
+			<img src="images/pyrrole_eld_mo2.png" alt="pyrrole energy level diagram and molecular orbital plot"/>
+			<br/>			
+		</p>
+		
+		<p>
+			Those are the basics of Orbis. You can learn more about some of the other features with the links below.
+			<ul>
+                <li><a href="sketch.html">The Molecule Sketch Pad and Huckel Determinant</a></li>
+                <li><a href="results.html">Calculated Results</a></li>
+                <li><a href="importexport.html">Importing and Exporting Data</a></li>
+            </ul>
+			<br/><br/>
+		</p>
+    </div>
+
+    <div class="col2">
+
+        <h1>FAQ</h1>
+
+        <p> Coming soon... </p>
+
+        <p>Got a question? Email it to <a href="mailto:mail@simplehuckel.com">mail@simplehuckel.com</a>!
+
+        
+    </div>
+
+    <div class="footer">
+        <a href="./">homepage</a> | <a href="mailto:mail@simplehuckel.com">contact</a> | <a href="http://validator.w3.org/check?uri=referer">html</a> | <a href="http://jigsaw.w3.org/css-validator">css</a> |  &copy; 2009 Heaviside Software| Design by <a href="http://www.mitchinson.net"> www.mitchinson.net</a><br/>
+        <!--This website template is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/3.0/">Creative Commons Attribution 3.0  License</a>-->
+    </div>
+
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-5990208-4");
+pageTracker._trackPageview();
+} catch(err) {}</script>    
+</body>
+</html>
