@@ -1,0 +1,266 @@
+html, body {
+height: 800px;
+}
+body {
+margin:0;
+padding:0;
+font: 75% verdana, helvetica, arial, sans-serif;
+line-height: 1.8em;
+color: #999;
+background: #fff;
+}
+				/*HEADER*/	
+.header {
+height: 100px;
+width:100%;
+padding-top:0;
+background:#007EBB url(images/header2.png) repeat-x;
+}
+				/*HEADER LOGO*/	
+.logo {
+width:500px;
+padding:10px 0 0 0;
+margin: 0 0 0 230px;
+font: bold 2.6em georgia, sans-serif;
+letter-spacing: 5px;
+/*color:#DCE4F6;	*/
+color: #666;
+}
+
+.logo_under {
+width:500px;
+padding:0px 0 0 0;
+margin: 0 0 0 230px;
+font: bold 1.3em georgia, sans-serif;
+letter-spacing: 5px;
+color:#DCE4F6;	
+}
+
+				/*TOP NAVBAR*/	
+#topnav {
+position:relative;
+display:block;
+height:39px;
+margin:0 0 10px 0;
+background:transparent url(images/bgOFF.gif) repeat-x top left;
+font: bold 1em Arial,Verdana,Helvitica,sans-serif;
+}
+#topnav  ul {
+margin:0;
+padding:0;
+list-style-type:none;
+width:auto;
+}
+#topnav  ul li {
+display:block;
+float:left;
+margin:0;
+}
+#topnav  ul li a {letter-spacing: 2px;
+display:block;
+float:left;
+padding:11px 20px 0 20px;
+height:23px;
+text-decoration:none;
+color:#666;
+background:transparent url(images/bgDIVIDER.gif) no-repeat top right;
+}
+#topnav  ul li a:hover,#topnav ul li a.current {
+color:#993333;
+background:#fff url(images/bgON.gif) no-repeat top left;
+}
+
+				/*LEFT SIDEBAR*/	
+.sidebar {
+float:left;
+width:20%;
+background:transparent;
+height:100%;
+padding-top:0;
+border-right: 1px solid #eee;
+}
+.sidebar img {
+padding-left: 15px;
+}
+				/*COLUMNS*/	
+.gutter {
+float : left;
+width : 1%;
+height : 1px;
+}
+.col1 {
+float:left;
+width: 39%;
+margin-left:1%;
+margin-right:1%;	
+}
+.col2 {
+float:left;
+width: 29%;
+}
+				/*FOOTER*/			
+.footer {
+float:left;
+width:100%;
+padding-top:10px;
+padding-bottom:0;
+text-align:center;
+/*background:#6897C0 url(images/foot.jpg) repeat-x;*/
+background:#6897C0;
+color:#DCE4F6;
+}
+				/*LINKS*/	
+a:link, a:visited {
+color:#993333;
+text-decoration:none;
+}
+a:hover {
+text-decoration: underline;
+color: #aaa;
+}
+				/*TYPOGRAPHY*/
+blockquote {
+font-weight : normal;
+font-style : italic;
+color : #6897C0;
+}
+h1 {
+font:normal 1.7em georgia, arial, Helvetica, sans-serif;
+letter-spacing: 3px;
+color:#993333;
+padding:10px;
+}
+h2 {
+	font:bold 1.7em georgia, arial, Helvetica, sans-serif;
+	letter-spacing: 3px;
+	color:#BAD0BF;
+	padding:10px;
+}
+p {
+	padding-left:10px;
+	padding-right:10px;
+}
+p strong {
+color: #993333;
+}
+pre{
+background: #EFEFEF;
+color: #6897C0;
+padding: 20px;
+}
+				/*IMAGES*/	
+.imgleft {
+float: left;
+margin-right: 20px;
+padding: 10px;
+border: 0px solid #eee;
+}
+				/*LEFT MENU*/
+#navlist {
+padding-left: 0;
+margin-left: 0;
+border-bottom: 1px solid #eee;
+width: auto;
+}
+#navlist li {
+list-style: none;
+margin: 0;
+padding: 0.25em;
+border-top: 1px solid #eee;
+}
+#navlist li a { text-decoration: none;
+color: #aaa;
+background :url(images/arrow.png) left center no-repeat;
+padding-left: 20px;
+}
+#navlist li a:hover {
+text-decoration: none;color: #993333;
+}
+				/*LOGIN BOX*/
+#loginform {
+width:auto;
+margin:10px 10px 10px 0;
+}
+#loginform fieldset{
+padding:10px;
+}
+#loginform legend{
+font-weight:bold;
+font-size:9pt;
+}
+#loginform label{
+display:block;
+height:2em;
+background:#ECF2ED;
+padding:10px 10px 0;
+}
+#loginform input {
+margin-right:15px;
+border:1px solid #999;
+float:right;
+clear:right;
+background:#fff;
+color: #96B89D;
+}
+#loginform input:focus,#loginform input:hover {
+border:1px solid #333;
+}
+.error{
+color:red;
+font-weight:bold;
+}
+
+
+div.buttons {
+background-image:url(images/button_out_80.png); background-position:center; background-repeat:no-repeat; width:199px; height:54px; text-align:center; padding-top: 20px;
+}
+
+div.buttons:hover {
+background-image:url(images/button_in_80.png); background-position:center; background-repeat:no-repeat;
+}
+
+a.buttons {
+color: #FFFFFF; font-size: 24px; font-weight:bold; text-decoration:none;
+}
+
+a.buttons:hover {
+text-decoration:underline;
+}
+
+a.buttons span{
+ font: bold 12px Arial;
+}
+/*Button Credits: Dynamic Drive CSS Library */
+/*URL: http://www.dynamicdrive.com/style/ */
+
+a.boldbuttons{
+background: transparent url('images/roundedge-gray-left.gif') no-repeat top left;
+display: block;
+float: left;
+font: bold 13px Arial; /* Change 13px as desired */
+line-height: 22px; /* This value + 4px + 4px (top and bottom padding of SPAN) must equal height of button background (default is 30px) */
+height: 30px; /* Height of button background height */
+padding-left: 8px; /* Width of left menu image */
+text-decoration: none;
+
+}
+
+a:link.boldbuttons, a:visited.boldbuttons, a:hover.boldbuttons, a:active.boldbuttons{
+color: white; /*button text color*/
+}
+
+a.boldbuttons span{
+background: transparent url('images/roundedge-gray-right.gif') no-repeat top right;
+display: block;
+padding: 4px 10px 4px 2px; /*Set 10px to be equal or greater than'padding-left' value above*/
+}
+
+a:hover.boldbuttons{ /* Hover state CSS */
+text-decoration: underline;
+}
+
+
+.buttonwrapper{ /* Container you can use to surround a CSS button to clear float */
+overflow: hidden; /*See: http://www.quirksmode.org/css/clearing.html */
+width: 100%;
+}

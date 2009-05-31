@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+    <title>Orbis - Simple Huckel Molecular Orbitals (SHMO) by Heaviside Software - Help and FAQ's</title>
+    <meta name="description" content="Software for performing Simple Huckel Molecular Orbital (SHMO) calculations."/>
+    <meta name="keywords" content="Simple Huckel, Orbital, Molecular, SHMO, 
+
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+
+</head>
+
+<body>
+
+    <div class="header">
+
+        <div class="logo">Orbis</div><br/>
+        <div class="logo_under">by Heaviside Software</div>
+
+    </div>
+
+    <div id="topnav">
+        <ul>
+            <li><a href="./index.html" title="" >Home</a></li>
+            <li><a href="./screenshots.html" title="">Screenshots</a></li>            
+            <li><a href="./docs.html" class="current">Documentation</a>
+            <li><a href="./services.html" title="">Other Services</a></li>            
+            <li><a href="./contact.html" title="">Contact</a></li>
+        </ul>
+    </div>	
+
+    <div class="gutter"></div>
+
+    <div class="sidebar">
+
+        <!--<h1>Products</h1>-->
+    
+        <!--<div id="navcontainer">-->
+            <!--<ul id="navlist">-->
+                <!--<li id="active"><a href="orbis.html" id="current">Orbis - SHMO Analysis</a></li>-->
+            <!--</ul>-->
+        <!--</div>-->
+    
+        <h1>Download Free Trial</h1>
+        <a class="buttons" href="./downloads/install_orbis.exe"><div class="buttons">Download!<br/><span>Beta v0.2.0</span></div></a>
+
+    
+        <p> Download the fully functional beta version of Orbis. This beta
+        version will be available free of charge until June 1<sup>st</sup>,
+        2009. Take a look and <a href="mailto:mail@simplehuckel.com">let me
+        know</a> what you think. Your feedback can help make Orbis even
+        better!</p> 
+        
+    <blockquote> <p> At this time Orbis is available for Windows only although
+    a Mac version should be made available at some point in the near
+    future.</p> </blockquote>
+    
+        <!--<form id="loginform" method="post" action="">-->
+            <!--<fieldset>-->
+                <!--<legend>Log in</legend>-->
+                <!--<p>Please enter your username and password</p>-->
+                <!--<label for="username"><input type="text" name="username" tabindex="1" id="username" value="demo only" size="10" />username: </label>-->
+                <!--<label for="password"><input type="password" name="password" tabindex="2" id="password" size="10" />password:</label>-->
+                <!--<label for="remember_me"><input type="checkbox" name="remember_me" value="1" tabindex="3" id="remember_me" />Remember me ?  </label>-->
+                <!--<label for="submit">-->
+                    <!--<input name="Submit" type="submit" id="submit" tabindex="4" value="Log in" />-->
+                <!--</label>-->
+    
+            <!--</fieldset>-->
+        <!--</form>-->
+    
+    </div>
+
+    <div class="col1">  
+
+        <h1>Orbis Help</h1>
+    
+        
+        <h2><a name="quickstart">The Molecule Sketch Pad and Huckel Determinant</a></h2> 
+
+        
+		<h3>Drawing and deleting atoms and bonds</h3>
+		<p>
+			<b>To draw an atom:</b> Use the dropdown atom type list to select the atom type that you wish to add and then click on the Molecule Sketch Pad.
+			Atoms are labled with their atomic symbol and their atom number. <br/><img src="images/single_atom.png" alt="single atom with label"/><br/>
+			As you add more molecules the Huckel determinant will grow in size and the appropriate value for the h<sub>X</sub> parameter will be placed along the diagonal.	
+			For example if the third atom that you add is of type N3 (nitrogen with a coordination number of 3) than the Huckel determinant at position (3,3)
+			will be given a value of -1.37.<sup>[<a href="#notes">1</a>]</sup>
+		</p>
+		<p>
+			<b>	To create a bond:</b> Click on an atom and hold the mouse button down while moving the mouse to another atom.  
+			Releasing the mouse on another atom will create a bond between the two.  Orbis will automatically determine the type of bond and set the 
+			value of the Huckel determinant at (i,j), where i and j are the atom numbers involved in the bond, to the appropriate value of k<sub>X-Y</sub>.<br/>
+			<img src="images/hx_kxy.png" style="width:450px" alt="automatic kxy determination"/>
+			
+		</p>
+		
+		<p>
+			<b>To delete an atom or bond:</b> Right clicking on an atom or bond will remove it from the molecule.  When you delete an atom, 
+			any bonds assosciated with that atom will also be deleted.
+			
+		</p>
+			
+		<h3>Changing atom and bond types</h3>
+		<p>
+			You can change the type of any atom or bond (or just the value of h<sub>X</sub> and k<sub>X-Y</sub>) by double clicking on an atom or bond.
+			This will bring up a dialog that will allow you to choose the new atom/bond type and its h<sub>X</sub>/k<sub>X-Y</sub> value. The figure
+			below shows how you would convert one of the carbon atoms in a benzene ring to N2 to create a pyridine ring.  Of course h<sub>X</sub> and k<sub>X-Y</sub>
+			values can also be directly edited in the Huckel determinant.<br/>
+			<img src="images/change_atom.png" style="width:450px" alt="Change atom dialog"/>
+		</p>
+			
+		<h3>Redrawing the canvas</h3>
+		
+		<p>
+			After drawing a molecule you can use the <b>Redraw</b> button to tidy up the canvas.  The figure below shows a molecule before and after a redraw.<br/>
+			<img src="images/redraw.png" style="width:450px"alt="Redraw the canvas"/>
+		</p>
+			
+			
+		<h3>Zooming and rotating the canvas</h3>
+		<p>
+			The molecule sketch pad can be zoomed or rotated by using the mouse scroll wheel or holding down Ctrl and using the scroll wheel respectively.
+			The + and - keys can also be used to zoom in or out while holding down Ctrl key in combination with the same keys will rotate the plot.
+		</p>
+		
+		<p>
+			You can learn more about some of the other features with the links below.
+			<ul>
+				<li><a href="docs.html">Quick Start Guide</a></li>
+                <li><a href="results.html">Calculated Results</a></li>
+                <li><a href="importexport.html">Importing and Exporting Data</a></li>
+            </ul>
+			<br/><br/>
+		</p>
+		<p>
+		<H3><a name="notes"/>Notes</a></H3>
+		[1] Orbis's default values of h<sub>X</sub> and k<sub>X-Y</sub> are taken from Table 5.1 on page 94 <b>Orbital Interaction Theory of Organic Chemistry</b> by A. Rauk.
+		</p>
+    </div>
+
+    <div class="col2">
+
+        <h1>FAQ</h1>
+
+        <p> Coming soon... </p>
+
+        <p>Got a question? Email it to <a href="mailto:mail@simplehuckel.com">mail@simplehuckel.com</a>!
+
+        
+    </div>
+
+    <div class="footer">
+        <a href="./">homepage</a> | <a href="mailto:mail@simplehuckel.com">contact</a> | <a href="http://validator.w3.org/check?uri=referer">html</a> | <a href="http://jigsaw.w3.org/css-validator">css</a> |  &copy; 2009 Heaviside Software| Design by <a href="http://www.mitchinson.net"> www.mitchinson.net</a><br/>
+        <!--This website template is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/3.0/">Creative Commons Attribution 3.0  License</a>-->
+    </div>
+
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-5990208-4");
+pageTracker._trackPageview();
+} catch(err) {}</script>    
+</body>
+</html>
