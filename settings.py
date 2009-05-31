@@ -11,7 +11,7 @@ logfile.flush()
 
 
 website = "http://www.simplehuckel.com"
-timebomb = (2009,6,1)
+timebomb = (2009,7,12)
 version = "0.2.0"
 tool_tip_time = 4
 

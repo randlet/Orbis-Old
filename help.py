@@ -1,7 +1,10 @@
 import settings
+import datetime
 import wx
 import wx.html
+tb = datetime.date(*settings.timebomb)
 
+tb_f = tb.isoformat()
 class About(wx.Dialog): 
     text = ''' 
 <html> 
@@ -16,6 +19,9 @@ cellpadding="0" border="1">
 <p><b>Orbis</b> is a program for solving Simple Huckel Molecular Orbital (SHMO) problems.
 For more information see www.simplehuckel.com.
 </p> 
+
+<p>This trial version will expire on '''+tb_f+'''</p>
+
 <p><b>Orbis</b> is brought to you by 
 Heaviside Software, Copyright 
 &copy; 2009.</p> 

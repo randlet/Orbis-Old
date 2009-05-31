@@ -2,8 +2,8 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Orbis"
-#define MyAppVerName "Orbis 0.2.0"
-#define MyAppVersion "0.2.0"
+#define MyAppVerName "Orbis 0.2.1"
+#define MyAppVersion "0.2.1"
 #define MyAppPublisher "Heaviside Software"
 #define MyAppURL "http://www.simplehuckel.com"
 #define MyAppExeName "orbis.exe"
