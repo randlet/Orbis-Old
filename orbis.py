@@ -17,6 +17,7 @@ from help import About
 import os
 import pickle
 import sys
+import settings
 
 
 # begin wxGlade: extracode
@@ -115,7 +116,7 @@ class MainFrame(wx.Frame):
         self.CreateStatusBar()
         
         self.doLayout()
-        self.checkTimeBomb()
+        #self.checkTimeBomb()
         self.results_display.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED,self.OnNoteBookPage)        
         
         if fname != None:
@@ -827,13 +828,20 @@ class MainFrame(wx.Frame):
         main_sizer.Fit(self)
         self.main_sizer = main_sizer
         self.results_sizer = results_sizer
-        self.setVisualMode(True)
+        self.setVisualMode(True) 
         self.Layout()
         self.Maximize()
         icon1 = wx.Icon(settings.icon_file, wx.BITMAP_TYPE_ICO)
         self.SetIcon(icon1)        
 
-
+def check_num_atoms_exceeded(num):
+    if num  >= settings.max_num_atoms: 
+        
+        wx.MessageBox("We're sorry but this Orbis trial version only allows %d atoms. Please visit %s to purchase a full copy." % (settings.max_num_atoms,settings.website),"Max Atoms Exceeded",style=wx.OK)
+        return True
+    else:
+        return False
+    
 if __name__ == "__main__":
 
     try:

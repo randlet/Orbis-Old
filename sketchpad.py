@@ -1,4 +1,5 @@
 import time
+from orbis import check_num_atoms_exceeded 
 from guiparts import PlotPanel
 from molecule import Molecule,Atom,Bond
 import matplotlib
@@ -182,6 +183,10 @@ class MoleculePlotPanel(PlotPanel):
         return  not (click_on_bond_or_atom or unconnected_bond or down_on_atom)
     #------------------------------------------------------------------------------------------------                      
     def addNewAtom(self,x,y,hx=0.0,sym=""):
+        if settings.is_trial_version:
+            if check_num_atoms_exceeded(len(self.molecule.atom_stack)):
+                return
+            
         if sym == "":
             sym = self.current_atom_type
         #make sure all atom types are present

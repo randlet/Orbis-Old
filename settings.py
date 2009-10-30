@@ -11,8 +11,12 @@ logfile.flush()
 
 
 website = "http://www.simplehuckel.com"
-timebomb = (2009,7,12)
+timebomb = (2010,7,12)
 version = "0.2.0"
+
+is_trial_version = True
+max_num_atoms = 5
+
 tool_tip_time = 4
 
 #equivalnce threshold i.e. abs(a-b)<eps implies a=b
